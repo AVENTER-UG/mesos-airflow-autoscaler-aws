@@ -1,4 +1,19 @@
-package mesos
+package main
+
+type Config struct {
+	Username string
+	Password string
+	MesosMasterServer string
+	LogLevel string
+	AppName string
+	RedisServer string
+	RedisPassword string
+	RedisDB int
+	MesosSSL bool
+	SkipSSL bool
+	PollIntervall ptypes.Duration
+	PollTimeout ptypes.Duration
+}
 
 type MesosTasks struct {
 	Tasks []MesosTask `json:"tasks"`
