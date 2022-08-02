@@ -88,6 +88,7 @@ func (e *Scheduler) EventLoop() {
 func (e *Scheduler) getDags() []cfg.DagTask {
 	client := &http.Client{}
 	client.Transport = &http.Transport{
+		// #nosec G402
 		TLSClientConfig: &cTls.Config{InsecureSkipVerify: true},
 	}
 	req, _ := http.NewRequest("GET", e.Config.AirflowMesosScheduler+"/v0/dags", nil)
