@@ -25,7 +25,7 @@ func init() {
 	config.RedisPrefix = util.Getenv("REDIS_PREFIX", "asg")
 	config.APIUsername = util.Getenv("API_USERNAME", "user")
 	config.APIPassword = util.Getenv("API_PASSWORD", "password")
-	config.AWSSecret = util.Getenv("AWS_SECRET", "")
+	config.AWSLaunchTemplateID = os.Getenv("AWS_LAUNCH_TEMPLATE_ID")
 	config.AWSRegion = util.Getenv("AWS_REGION", "eu-central-1")
 	config.PollInterval = 5 * time.Second
 	config.PollTimeout = 10 * time.Second

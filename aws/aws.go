@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 // AWS struct about the AWS functions
@@ -13,6 +14,7 @@ type AWS struct {
 	Config    *cfg.Config
 	AWSConfig *aws.Config
 	Session   *session.Session
+	SVC       *ec2.EC2
 }
 
 func New(config *cfg.Config) *AWS {

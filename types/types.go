@@ -2,6 +2,8 @@ package types
 
 import (
 	"time"
+
+	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 // Config hold the configuration of these software
@@ -23,9 +25,8 @@ type Config struct {
 	RedisPrefix           string
 	APIUsername           string
 	APIPassword           string
-	AWSSecret             string
 	AWSRegion             string
-	AWSImageID            string
+	AWSLaunchTemplateID   string
 }
 
 type DagTask struct {
@@ -34,6 +35,7 @@ type DagTask struct {
 	RunID         string `json:"run_id"`
 	TryNumber     int    `json:"try_number"`
 	ASG           bool   `json:"ASG" default:"false"`
+	EC2           *ec2.Reservation
 	MesosExecutor struct {
 		Cpus     float64 `json:"cpus"`
 		MemLimit int     `json:"mem_limit"`

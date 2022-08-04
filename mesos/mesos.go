@@ -73,7 +73,7 @@ func (e *Scheduler) EventLoop() {
 					if timeDiff >= e.Config.WaitTimeout.Minutes() {
 						logrus.WithField("func", "EventLoop").Debug(">>> ASG ScaleUp ")
 						i.ASG = true
-						e.AWS.CreateInstance("t2.nano")
+						i.EC2 = e.AWS.CreateInstance("t2.nano")
 						e.Redis.SaveDagTaskRedis(i)
 					}
 				}
