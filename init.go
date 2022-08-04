@@ -27,6 +27,9 @@ func init() {
 	config.APIPassword = util.Getenv("API_PASSWORD", "password")
 	config.AWSLaunchTemplateID = os.Getenv("AWS_LAUNCH_TEMPLATE_ID")
 	config.AWSRegion = util.Getenv("AWS_REGION", "eu-central-1")
+	config.MesosAgentUsername = os.Getenv("MESOS_AGENT_USERNAME")
+	config.MesosAgentPassword = os.Getenv("MESOS_AGENT_PASSWORD")
+	config.MesosAgentPort = util.Getenv("MESOS_AGENT_PORT", "5051")
 	config.PollInterval = 5 * time.Second
 	config.PollTimeout = 10 * time.Second
 
@@ -38,6 +41,13 @@ func init() {
 		config.SSL = true
 	} else {
 		config.SSL = false
+	}
+
+	// The comunication to the mesos server should be via ssl or not
+	if strings.Compare(os.Getenv("MESOS_AGENT_SSL"), "true") == 0 {
+		config.MesosAgentSSL = true
+	} else {
+		config.MesosAgentSSL = false
 	}
 
 	protocol := "http://" + config.AirflowMesosScheduler

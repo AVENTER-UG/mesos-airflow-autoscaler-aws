@@ -1,6 +1,7 @@
 package mesos
 
 import (
+	"crypto/tls"
 	cTls "crypto/tls"
 	"encoding/json"
 	"net/http"
@@ -77,6 +78,11 @@ func (e *Scheduler) EventLoop() {
 						e.Redis.SaveDagTaskRedis(i)
 					}
 				}
+				// Check if we can terminate the ec2 instances
+				res, err := e.checkEC2Instances()
+				if err == nil && !res {
+					//terminate server
+				}
 
 			}
 		}
@@ -117,4 +123,56 @@ func (e *Scheduler) getDags() []cfg.DagTask {
 	}
 
 	return dags
+}
+
+func (e *Scheduler) checkEC2Instances() (bool, error) {
+	client := &http.Client{}
+	client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	protocol := "https"
+	if !e.Config.MesosAgentSSL {
+		protocol = "http"
+	}
+
+	// get all dags in redis and connect there mesos agent
+	keys := e.Redis.GetAllRedisKeys(e.Config.RedisPrefix + ":dags:*")
+	for keys.Next(e.Redis.RedisCTX) {
+		var server cfg.DagTask
+		key := e.Redis.GetRedisKey(keys.Val())
+
+		err := json.Unmarshal([]byte(key), &server)
+		if err != nil {
+			logrus.WithField("func", "checkEC2Instance").Error("Cannot unmarshal redis data: ", err.Error())
+			return false, err
+		}
+
+		hostIP := server.EC2.Instances[0].NetworkInterfaces[0].PrivateIpAddress
+
+		req, _ := http.NewRequest("POST", protocol+"://"+*hostIP+":"+e.Config.MesosAgentPort+"/state", nil)
+		req.Close = true
+		req.SetBasicAuth(e.Config.MesosAgentUsername, e.Config.MesosAgentPassword)
+		req.Header.Set("Content-Type", "application/json")
+		res, err := client.Do(req)
+
+		if err != nil {
+			logrus.WithField("func", "checkEC2Instances").Error("Could not connect to agent: ", err.Error())
+			return false, err
+		}
+
+		defer res.Body.Close()
+
+		var agent cfg.MesosAgentState
+		err = json.NewDecoder(res.Body).Decode(&agent)
+		if err != nil {
+			logrus.WithField("func", "checkEC2Instances").Error("Could not encode json result: ", err.Error())
+			return false, err
+		}
+
+		if len(agent.Frameworks) > 0 {
+			return true, nil
+		}
+	}
+	return false, nil
 }
