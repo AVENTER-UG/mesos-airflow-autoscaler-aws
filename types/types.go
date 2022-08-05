@@ -14,11 +14,13 @@ type Config struct {
 	LogLevel              string
 	AppName               string
 	Wait                  string
+	AWSWait               string
 	SSL                   bool
 	SkipSSL               bool
 	PollInterval          time.Duration
 	PollTimeout           time.Duration
 	WaitTimeout           time.Duration
+	AWSTerminateWait      time.Duration
 	RedisServer           string
 	RedisPassword         string
 	RedisDB               int

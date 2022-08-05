@@ -49,7 +49,7 @@ func (e *Scheduler) EventLoop() {
 
 				// get current time
 				timeNow := time.Now()
-				timeDiff := timeNow.Sub(timeTask).Minutes()
+				timeDiff := timeNow.Sub(timeTask).Seconds()
 
 				if err != nil {
 					logrus.WithField("func", "EventLoop").Error("Cannot parse TimeStamp: ", err.Error())
@@ -70,8 +70,7 @@ func (e *Scheduler) EventLoop() {
 					i = *sTask
 					logrus.WithField("func", "EventLoop").Debug("=== ASG Already ")
 				} else {
-
-					if timeDiff >= e.Config.WaitTimeout.Minutes() {
+					if timeDiff >= e.Config.WaitTimeout.Seconds() {
 						logrus.WithField("func", "EventLoop").Debug(">>> ASG ScaleUp ")
 						i.ASG = true
 						i.EC2 = e.AWS.CreateInstance("t2.nano")
@@ -79,9 +78,11 @@ func (e *Scheduler) EventLoop() {
 					}
 				}
 				// Check if we can terminate the ec2 instances
-				res, err := e.checkEC2Instances()
-				if err == nil && !res {
-					//terminate server
+				if i.EC2 != nil {
+					res, err := e.checkEC2Instance(i)
+					if err == nil && !res {
+						e.AWS.TerminateInstance(i)
+					}
 				}
 
 			}
@@ -125,7 +126,17 @@ func (e *Scheduler) getDags() []cfg.DagTask {
 	return dags
 }
 
-func (e *Scheduler) checkEC2Instances() (bool, error) {
+// check if the ec2 instance still running mesos tasks
+func (e *Scheduler) checkEC2Instance(server cfg.DagTask) (bool, error) {
+	// if the launch time is to short, do not try to connect reach the agent
+	// get current time
+	timeNow := time.Now()
+	timeDiff := timeNow.Sub(*server.EC2.Instances[0].LaunchTime).Minutes()
+
+	if timeDiff <= e.Config.AWSTerminateWait.Minutes() {
+		return true, nil
+	}
+
 	client := &http.Client{}
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -136,43 +147,30 @@ func (e *Scheduler) checkEC2Instances() (bool, error) {
 		protocol = "http"
 	}
 
-	// get all dags in redis and connect there mesos agent
-	keys := e.Redis.GetAllRedisKeys(e.Config.RedisPrefix + ":dags:*")
-	for keys.Next(e.Redis.RedisCTX) {
-		var server cfg.DagTask
-		key := e.Redis.GetRedisKey(keys.Val())
+	hostIP := server.EC2.Instances[0].NetworkInterfaces[0].PrivateIpAddress
 
-		err := json.Unmarshal([]byte(key), &server)
-		if err != nil {
-			logrus.WithField("func", "checkEC2Instance").Error("Cannot unmarshal redis data: ", err.Error())
-			return false, err
-		}
+	req, _ := http.NewRequest("POST", protocol+"://"+*hostIP+":"+e.Config.MesosAgentPort+"/state", nil)
+	req.Close = true
+	req.SetBasicAuth(e.Config.MesosAgentUsername, e.Config.MesosAgentPassword)
+	req.Header.Set("Content-Type", "application/json")
+	res, err := client.Do(req)
 
-		hostIP := server.EC2.Instances[0].NetworkInterfaces[0].PrivateIpAddress
+	if err != nil {
+		logrus.WithField("func", "checkEC2Instances").Error("Could not connect to agent: ", err.Error())
+		return false, err
+	}
 
-		req, _ := http.NewRequest("POST", protocol+"://"+*hostIP+":"+e.Config.MesosAgentPort+"/state", nil)
-		req.Close = true
-		req.SetBasicAuth(e.Config.MesosAgentUsername, e.Config.MesosAgentPassword)
-		req.Header.Set("Content-Type", "application/json")
-		res, err := client.Do(req)
+	defer res.Body.Close()
 
-		if err != nil {
-			logrus.WithField("func", "checkEC2Instances").Error("Could not connect to agent: ", err.Error())
-			return false, err
-		}
+	var agent cfg.MesosAgentState
+	err = json.NewDecoder(res.Body).Decode(&agent)
+	if err != nil {
+		logrus.WithField("func", "checkEC2Instances").Error("Could not encode json result: ", err.Error())
+		return false, err
+	}
 
-		defer res.Body.Close()
-
-		var agent cfg.MesosAgentState
-		err = json.NewDecoder(res.Body).Decode(&agent)
-		if err != nil {
-			logrus.WithField("func", "checkEC2Instances").Error("Could not encode json result: ", err.Error())
-			return false, err
-		}
-
-		if len(agent.Frameworks) > 0 {
-			return true, nil
-		}
+	if len(agent.Frameworks) > 0 {
+		return true, nil
 	}
 	return false, nil
 }

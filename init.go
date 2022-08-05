@@ -17,7 +17,8 @@ func init() {
 
 	config.AirflowMesosScheduler = util.Getenv("AIRFLOW_MESOS_SCHEDULER", "127.0.0.1:11000")
 	config.LogLevel = util.Getenv("LOGLEVEL", "debug")
-	config.Wait = util.Getenv("WAIT_MINUTES", "5")
+	config.Wait = util.Getenv("WAIT_TIME", "2m")
+	config.AWSWait = util.Getenv("AWS_WAIT_TIME", "5m")
 	config.AppName = "AWS Autoscale for Apache Airflow"
 	config.RedisServer = util.Getenv("REDIS_SERVER", "127.0.0.1:6480")
 	config.RedisPassword = os.Getenv("REDIS_PASSWORD")
@@ -34,8 +35,10 @@ func init() {
 	config.PollTimeout = 10 * time.Second
 
 	// set the time to wait that the dag is running until we scale up AWS
-	tOut, _ := time.ParseDuration(config.Wait)
-	config.WaitTimeout = tOut * time.Minute
+	config.WaitTimeout, _ = time.ParseDuration(config.Wait)
+
+	// set the time to wait until we will check if we can terminte the ec2 instance
+	config.AWSTerminateWait, _ = time.ParseDuration(config.AWSWait)
 
 	if strings.Compare(os.Getenv("SSL"), "true") == 0 {
 		config.SSL = true

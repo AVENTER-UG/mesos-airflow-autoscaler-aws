@@ -28,4 +28,5 @@ func (e *AWS) CreateInstance(instanceType string) *ec2.Reservation {
 
 	logrus.WithField("func", "CreateInstance").Info("Created Instance: ", *runResult.Instances[0].InstanceId)
 	return runResult
+
 }
