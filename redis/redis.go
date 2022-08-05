@@ -3,8 +3,10 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	cfg "github.com/AVENTER-UG/mesos-autoscale/types"
+	"github.com/aws/aws-sdk-go/service/ec2"
 	goredis "github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
 )
@@ -66,6 +68,19 @@ func (e *Redis) GetTaskFromRunID(key string) *cfg.DagTask {
 	return nil
 }
 
+// GetEC2InstanceFromID get out the task to an runID
+func (e *Redis) GetEC2InstanceFromID(key string) *ec2.Reservation {
+	// search matched taskid in redis and update the status
+	keys := e.GetRedisKey(key)
+	if len(keys) > 0 {
+		var instance *ec2.Reservation
+		json.Unmarshal([]byte(keys), &instance)
+		return instance
+	}
+
+	return nil
+}
+
 // CountRedisKey will get back the count of the redis key
 func (e *Redis) CountRedisKey(pattern string) int {
 	keys := e.GetAllRedisKeys(pattern)
@@ -77,19 +92,19 @@ func (e *Redis) CountRedisKey(pattern string) int {
 	return count
 }
 
-// SaveConfig store the current framework config
-func (e *Redis) SaveConfig() {
-	data, _ := json.Marshal(e.Config)
-	err := e.RedisClient.Set(e.RedisCTX, e.Config.RedisPrefix+":framework_config", data, 0).Err()
-	if err != nil {
-		logrus.Error("Framework save config and state into redis Error: ", err)
-	}
-}
-
 // SaveTaskRedis store mesos task in DB
 func (e *Redis) SaveDagTaskRedis(task cfg.DagTask) {
 	d, _ := json.Marshal(&task)
-	e.SetRedisKey(d, task.DagID+":"+task.TaskID+":"+task.RunID)
+	e.SetRedisKey(d, task.DagID+":"+task.TaskID+":"+task.RunID+":"+strconv.Itoa(task.TryNumber))
+}
+
+// SaveEC2InstanceRedis store mesos task in DB
+func (e *Redis) SaveEC2InstanceRedis(instance *ec2.Reservation) {
+	d, _ := json.Marshal(&instance)
+	err := e.RedisClient.Set(e.RedisCTX, e.Config.RedisPrefix+":ec2:"+*instance.Instances[0].InstanceId, d, 0).Err()
+	if err != nil {
+		logrus.WithField("func", "SaveData").Error("Could not save data in Redis: ", err.Error())
+	}
 }
 
 // SetRedisKey store data in redis

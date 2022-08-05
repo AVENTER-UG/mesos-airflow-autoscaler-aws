@@ -1,17 +1,16 @@
 package mesosaws
 
 import (
-	cfg "github.com/AVENTER-UG/mesos-autoscale/types"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/sirupsen/logrus"
 )
 
-func (e *AWS) TerminateInstance(instance cfg.DagTask) {
+func (e *AWS) TerminateInstance(instance *string) {
 	// Create EC2 service client
 	e.SVC = ec2.New(e.Session)
 
 	input := &ec2.TerminateInstancesInput{
-		InstanceIds: []*string{instance.EC2.Instances[0].InstanceId},
+		InstanceIds: []*string{instance},
 	}
 
 	// terminate the given instance

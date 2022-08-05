@@ -5,6 +5,7 @@ import (
 	cTls "crypto/tls"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -58,6 +59,7 @@ func (e *Scheduler) EventLoop() {
 				logrus.WithField("func", "EventLoop").Debug("Dag ID: ", i.DagID)
 				logrus.WithField("func", "EventLoop").Debug("Dag Task ID: ", i.TaskID)
 				logrus.WithField("func", "EventLoop").Debug("Dag Run ID: ", i.RunID)
+				logrus.WithField("func", "EventLoop").Debug("Dag TryNumber: ", strconv.Itoa(i.TryNumber))
 				logrus.WithField("func", "EventLoop").Debug("Dag Task Age: ", timeDiff)
 				logrus.WithField("func", "EventLoop").Debug("Dag CPUs: ", i.MesosExecutor.Cpus)
 				logrus.WithField("func", "EventLoop").Debug("Dag MEM: ", i.MesosExecutor.MemLimit)
@@ -65,7 +67,7 @@ func (e *Scheduler) EventLoop() {
 				logrus.WithField("func", "EventLoop").Debug("---------------------------------------")
 
 				// check if the runID already exist
-				sTask := e.Redis.GetTaskFromRunID(e.Config.RedisPrefix + ":dags:" + i.DagID + ":" + i.TaskID + ":" + i.RunID)
+				sTask := e.Redis.GetTaskFromRunID(e.Config.RedisPrefix + ":dags:" + i.DagID + ":" + i.TaskID + ":" + i.RunID + ":" + strconv.Itoa(i.TryNumber))
 				if sTask != nil {
 					i = *sTask
 					logrus.WithField("func", "EventLoop").Debug("=== ASG Already ")
@@ -73,19 +75,14 @@ func (e *Scheduler) EventLoop() {
 					if timeDiff >= e.Config.WaitTimeout.Seconds() {
 						logrus.WithField("func", "EventLoop").Debug(">>> ASG ScaleUp ")
 						i.ASG = true
-						i.EC2 = e.AWS.CreateInstance("t2.nano")
+						e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance("t2.nano"))
 						e.Redis.SaveDagTaskRedis(i)
-					}
-				}
-				// Check if we can terminate the ec2 instances
-				if i.EC2 != nil {
-					res, err := e.checkEC2Instance(i)
-					if err == nil && !res {
-						e.AWS.TerminateInstance(i)
 					}
 				}
 
 			}
+			// Check if we can terminate the ec2 instances
+			go e.checkEC2Instance()
 		}
 	}
 
@@ -122,55 +119,65 @@ func (e *Scheduler) getDags() []cfg.DagTask {
 		logrus.WithField("func", "getDags").Error("Cannot decode json: ", err.Error())
 		return nil
 	}
-
 	return dags
 }
 
 // check if the ec2 instance still running mesos tasks
-func (e *Scheduler) checkEC2Instance(server cfg.DagTask) (bool, error) {
-	// if the launch time is to short, do not try to connect reach the agent
-	// get current time
-	timeNow := time.Now()
-	timeDiff := timeNow.Sub(*server.EC2.Instances[0].LaunchTime).Minutes()
+func (e *Scheduler) checkEC2Instance() {
+	logrus.WithField("func", "checkEC2Instance").Info("Check EC2 Instances")
+	keys := e.Redis.GetAllRedisKeys(e.Config.RedisPrefix + ":ec2:*")
+	for keys.Next(e.Redis.RedisCTX) {
+		logrus.WithField("func", "checkEC2Instance").Debug("Instances: ", keys.Val())
+		instance := e.Redis.GetEC2InstanceFromID(keys.Val())
 
-	if timeDiff <= e.Config.AWSTerminateWait.Minutes() {
-		return true, nil
+		// if the launch time is to short, do not try to connect reach the agent
+		// get current time
+		timeNow := time.Now()
+		timeDiff := timeNow.Sub(*instance.Instances[0].LaunchTime).Minutes()
+
+		if timeDiff <= e.Config.AWSTerminateWait.Minutes() {
+			continue
+		}
+
+		client := &http.Client{
+			Timeout: 2 * time.Second,
+		}
+		client.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+
+		protocol := "https"
+		if !e.Config.MesosAgentSSL {
+			protocol = "http"
+		}
+
+		hostIP := instance.Instances[0].NetworkInterfaces[0].PrivateIpAddress
+
+		req, _ := http.NewRequest("POST", protocol+"://"+*hostIP+":"+e.Config.MesosAgentPort+"/state", nil)
+		req.Close = true
+		req.SetBasicAuth(e.Config.MesosAgentUsername, e.Config.MesosAgentPassword)
+		req.Header.Set("Content-Type", "application/json")
+		res, err := client.Do(req)
+
+		if err != nil {
+			logrus.WithField("func", "checkEC2Instances").Error("Could not connect to agent: ", err.Error())
+			e.AWS.TerminateInstance(instance.Instances[0].InstanceId)
+			e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.Instances[0].InstanceId)
+			continue
+		}
+
+		defer res.Body.Close()
+
+		var agent cfg.MesosAgentState
+		err = json.NewDecoder(res.Body).Decode(&agent)
+		if err != nil {
+			logrus.WithField("func", "checkEC2Instances").Error("Could not encode json result: ", err.Error())
+			continue
+		}
+
+		if len(agent.Frameworks) <= 0 {
+			e.AWS.TerminateInstance(instance.Instances[0].InstanceId)
+			e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.Instances[0].InstanceId)
+		}
 	}
-
-	client := &http.Client{}
-	client.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	protocol := "https"
-	if !e.Config.MesosAgentSSL {
-		protocol = "http"
-	}
-
-	hostIP := server.EC2.Instances[0].NetworkInterfaces[0].PrivateIpAddress
-
-	req, _ := http.NewRequest("POST", protocol+"://"+*hostIP+":"+e.Config.MesosAgentPort+"/state", nil)
-	req.Close = true
-	req.SetBasicAuth(e.Config.MesosAgentUsername, e.Config.MesosAgentPassword)
-	req.Header.Set("Content-Type", "application/json")
-	res, err := client.Do(req)
-
-	if err != nil {
-		logrus.WithField("func", "checkEC2Instances").Error("Could not connect to agent: ", err.Error())
-		return false, err
-	}
-
-	defer res.Body.Close()
-
-	var agent cfg.MesosAgentState
-	err = json.NewDecoder(res.Body).Decode(&agent)
-	if err != nil {
-		logrus.WithField("func", "checkEC2Instances").Error("Could not encode json result: ", err.Error())
-		return false, err
-	}
-
-	if len(agent.Frameworks) > 0 {
-		return true, nil
-	}
-	return false, nil
 }
