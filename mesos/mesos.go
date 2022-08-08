@@ -75,7 +75,14 @@ func (e *Scheduler) EventLoop() {
 					if timeDiff >= e.Config.WaitTimeout.Seconds() {
 						logrus.WithField("func", "EventLoop").Debug(">>> ASG ScaleUp ")
 						i.ASG = true
-						e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance("t2.nano"))
+
+						if i.MesosExecutor.MemLimit >= 32768 {
+							go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance64))
+						} else if i.MesosExecutor.MemLimit >= 16384 {
+							go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance32))
+						} else {
+							go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance16))
+						}
 						e.Redis.SaveDagTaskRedis(i)
 					}
 				}
@@ -85,10 +92,9 @@ func (e *Scheduler) EventLoop() {
 			go e.checkEC2Instance()
 		}
 	}
-
 }
 
-// getDags
+// get all running dags from airflow mesos scheduler
 func (e *Scheduler) getDags() []cfg.DagTask {
 	client := &http.Client{}
 	client.Transport = &http.Transport{
@@ -143,6 +149,7 @@ func (e *Scheduler) checkEC2Instance() {
 			Timeout: 2 * time.Second,
 		}
 		client.Transport = &http.Transport{
+			// #nosec G402
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 

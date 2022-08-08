@@ -26,6 +26,9 @@ type Config struct {
 	APIUsername           string
 	APIPassword           string
 	AWSRegion             string
+	AWSInstance16         string
+	AWSInstance32         string
+	AWSInstance64         string
 	AWSLaunchTemplateID   string
 	MesosAgentUsername    string
 	MesosAgentPassword    string
@@ -41,7 +44,7 @@ type DagTask struct {
 	ASG           bool   `json:"ASG" default:"false"`
 	MesosExecutor struct {
 		Cpus     float64 `json:"cpus"`
-		MemLimit int     `json:"mem_limit"`
+		MemLimit int     `json:"mem_limit" default:"2048"`
 	} `json:"MesosExecutor"`
 }
 type MesosAgentState struct {

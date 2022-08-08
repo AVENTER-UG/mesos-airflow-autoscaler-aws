@@ -1,7 +1,7 @@
 #Dockerfile vars
 
 #vars
-IMAGENAME=mesos-airflow-aws-autoscaler
+IMAGENAME=mesos-airflow-autoscaler-aws
 REPO=avhost
 TAG=`git describe --tags --abbrev=0`
 BRANCH=`git rev-parse --abbrev-ref HEAD`
@@ -32,11 +32,9 @@ build-bin:
 
 publish:
 	@echo ">>>> Publish docker image"
-	@docker push ${IMAGEFULLNAME}:${BRANCH}
-	@docker push ${IMAGEFULLNAME}:${TAG}
-
-update-precommit:
-	@virtualenv --no-site-packages ~/.virtualenv
+	docker push ${IMAGEFULLNAME}:${BRANCH}
+	docker push ${IMAGEFULLNAME}:${TAG}
+	docker push ${IMAGEFULLNAME}:latest
 
 update-gomod:
 	go get -u

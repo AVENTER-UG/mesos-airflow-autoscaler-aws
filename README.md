@@ -19,6 +19,9 @@ This AWS autoscaler will start EC2 instances if Airflow does not get matched off
 | AWS_REGION | eu-central-1 | AWS Region |
 | AWS_WAIT_TIME | 5m | The time the autoscaler have to wait until it check if the EC2 intance can be terminated. |
 | AWS_LAUNCH_TEMPLATE_ID | | The AWS Launche Template ID | 
+| AWS_INSTANCE_16GB | t2.xlarge | The scale out instance type for memory limit lt 16GB (also the default instance if no memory limit was set) |
+| AWS_INSTANCE_32GB | t3.2xlarge | The scale out instance type for memory limit gt 32GB |
+| AWS_INSTANCE_64GB | r5.2xlarge | The scale out instance type for memory limit gt 64GB |
 
 
 ## Documentation
