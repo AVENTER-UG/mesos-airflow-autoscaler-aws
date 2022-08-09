@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	mesosaws "github.com/AVENTER-UG/mesos-autoscale/aws"
@@ -53,7 +54,6 @@ func (e *Scheduler) EventLoop() {
 
 // check if we have to scale out instances
 func (e *Scheduler) checkDags() {
-	logrus.WithField("func", "checkDags").Info("Check DAGs")
 	keys := e.Redis.GetAllRedisKeys(e.Config.RedisPrefix + ":dags:*")
 	for keys.Next(e.Redis.RedisCTX) {
 		logrus.WithField("func", "checkDags").Debug("DAG: ", keys.Val())
@@ -65,12 +65,16 @@ func (e *Scheduler) checkDags() {
 			i.ASG = true
 			e.Redis.SaveDagTaskRedis(*i)
 
+			var ec cfg.EC2Struct
 			if i.MesosExecutor.MemLimit >= 32768 {
-				go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance64))
+				ec.EC2 = e.AWS.CreateInstance(e.Config.AWSInstance64)
+				e.Redis.SaveEC2InstanceRedis(ec)
 			} else if i.MesosExecutor.MemLimit >= 16384 {
-				go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance32))
+				ec.EC2 = e.AWS.CreateInstance(e.Config.AWSInstance32)
+				e.Redis.SaveEC2InstanceRedis(ec)
 			} else {
-				go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance16))
+				ec.EC2 = e.AWS.CreateInstance(e.Config.AWSInstance16)
+				e.Redis.SaveEC2InstanceRedis(ec)
 			}
 
 		}
@@ -101,7 +105,6 @@ func (e *Scheduler) getDags() {
 		return
 	}
 
-	logrus.WithField("func", "getDags").Info("Get Data from Mesos")
 	var dags []cfg.DagTask
 	err = json.NewDecoder(res.Body).Decode(&dags)
 	if err != nil {
@@ -129,61 +132,91 @@ func (e *Scheduler) getDags() {
 
 // check if the ec2 instance still running mesos tasks
 func (e *Scheduler) checkEC2Instance() {
-	logrus.WithField("func", "checkEC2Instance").Info("Check EC2 Instances")
 	keys := e.Redis.GetAllRedisKeys(e.Config.RedisPrefix + ":ec2:*")
 	for keys.Next(e.Redis.RedisCTX) {
-		logrus.WithField("func", "checkEC2Instance").Debug("Instances: ", keys.Val())
 		instance := e.Redis.GetEC2InstanceFromID(keys.Val())
 
-		// if the launch time is to short, do not try to connect reach the agent
-		// get current time
-		timeNow := time.Now()
-		timeDiff := timeNow.Sub(*instance.Instances[0].LaunchTime).Minutes()
+		// Only check if there is not already a check running
+		if !instance.Check {
+			// if the launch time is to short, do not try to connect reach the agent
+			// get current time
+			timeNow := time.Now()
+			timeDiff := timeNow.Sub(*instance.EC2.Instances[0].LaunchTime).Minutes()
 
-		if timeDiff <= e.Config.AWSTerminateWait.Minutes() {
-			continue
-		}
+			if timeDiff <= e.Config.AWSTerminateWait.Minutes() {
+				continue
+			}
 
-		client := &http.Client{
-			Timeout: 60 * time.Second,
-		}
-		client.Transport = &http.Transport{
-			// #nosec G402
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
+			logrus.WithField("func", "checkEC2Instance").Info("Instances: ", keys.Val())
 
-		protocol := "https"
-		if !e.Config.MesosAgentSSL {
-			protocol = "http"
-		}
+			// set check state to true
+			instance.Check = true
+			e.Redis.SaveEC2InstanceRedis(*instance)
 
-		hostIP := instance.Instances[0].NetworkInterfaces[0].PrivateIpAddress
+			client := &http.Client{
+				Timeout: 5 * time.Minute,
+			}
+			client.Transport = &http.Transport{
+				// #nosec G402
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			}
 
-		req, _ := http.NewRequest("POST", protocol+"://"+*hostIP+":"+e.Config.MesosAgentPort+"/state", nil)
-		req.Close = true
-		req.SetBasicAuth(e.Config.MesosAgentUsername, e.Config.MesosAgentPassword)
-		req.Header.Set("Content-Type", "application/json")
-		res, err := client.Do(req)
+			protocol := "https"
+			if !e.Config.MesosAgentSSL {
+				protocol = "http"
+			}
 
-		if err != nil {
-			logrus.WithField("func", "checkEC2Instances").Error("Could not connect to agent: ", err.Error())
-			e.AWS.TerminateInstance(instance.Instances[0].InstanceId)
-			e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.Instances[0].InstanceId)
-			continue
-		}
+			hostIP := instance.EC2.Instances[0].NetworkInterfaces[0].PrivateIpAddress
 
-		defer res.Body.Close()
+			req, _ := http.NewRequest("POST", protocol+"://"+*hostIP+":"+e.Config.MesosAgentPort+"/state", nil)
+			req.Close = true
+			req.SetBasicAuth(e.Config.MesosAgentUsername, e.Config.MesosAgentPassword)
+			req.Header.Set("Content-Type", "application/json")
+			res, err := client.Do(req)
 
-		var agent cfg.MesosAgentState
-		err = json.NewDecoder(res.Body).Decode(&agent)
-		if err != nil {
-			logrus.WithField("func", "checkEC2Instances").Error("Could not encode json result: ", err.Error())
-			continue
-		}
+			if err != nil {
+				logrus.WithField("func", "checkEC2Instances").Error("Could not connect to agent: ", err.Error())
+				instance.Check = false
+				// increase the error counter
+				instance.AgentTimeout = instance.AgentTimeout + 1
+				e.Redis.SaveEC2InstanceRedis(*instance)
+				continue
+			}
 
-		if len(agent.Frameworks) <= 0 {
-			e.AWS.TerminateInstance(instance.Instances[0].InstanceId)
-			e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.Instances[0].InstanceId)
+			// set mesos agent error counter to zero if we got a connection
+			instance.AgentTimeout = 0
+
+			defer res.Body.Close()
+
+			var agent cfg.MesosAgentState
+			err = json.NewDecoder(res.Body).Decode(&agent)
+			if err != nil {
+				logrus.WithField("func", "checkEC2Instances").Error("Could not encode json result: ", err.Error())
+				// uncheck these instance
+				instance.Check = false
+				e.Redis.SaveEC2InstanceRedis(*instance)
+				continue
+			}
+
+			// uncheck these instance
+			instance.Check = false
+			e.Redis.SaveEC2InstanceRedis(*instance)
+
+			// check if there is still a airflow task running
+			if !e.isFrameworkName(agent) {
+				e.AWS.TerminateInstance(instance.EC2.Instances[0].InstanceId)
+				e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.EC2.Instances[0].InstanceId)
+			}
 		}
 	}
+}
+
+// check if there is still a airflow job running
+func (e *Scheduler) isFrameworkName(agent cfg.MesosAgentState) bool {
+	for _, framework := range agent.Frameworks {
+		if strings.ToLower(framework.Name) == strings.ToLower(e.Config.AirflowMesosName) {
+			return true
+		}
+	}
+	return false
 }

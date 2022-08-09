@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	cfg "github.com/AVENTER-UG/mesos-autoscale/types"
-	"github.com/aws/aws-sdk-go/service/ec2"
 	goredis "github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
 )
@@ -69,11 +68,11 @@ func (e *Redis) GetTaskFromRunID(key string) *cfg.DagTask {
 }
 
 // GetEC2InstanceFromID get out the task to an runID
-func (e *Redis) GetEC2InstanceFromID(key string) *ec2.Reservation {
+func (e *Redis) GetEC2InstanceFromID(key string) *cfg.EC2Struct {
 	// search matched taskid in redis and update the status
 	keys := e.GetRedisKey(key)
 	if len(keys) > 0 {
-		var instance *ec2.Reservation
+		var instance *cfg.EC2Struct
 		json.Unmarshal([]byte(keys), &instance)
 		return instance
 	}
@@ -99,9 +98,9 @@ func (e *Redis) SaveDagTaskRedis(task cfg.DagTask) {
 }
 
 // SaveEC2InstanceRedis store mesos task in DB
-func (e *Redis) SaveEC2InstanceRedis(instance *ec2.Reservation) {
+func (e *Redis) SaveEC2InstanceRedis(instance cfg.EC2Struct) {
 	d, _ := json.Marshal(&instance)
-	err := e.RedisClient.Set(e.RedisCTX, e.Config.RedisPrefix+":ec2:"+*instance.Instances[0].InstanceId, d, 0).Err()
+	err := e.RedisClient.Set(e.RedisCTX, e.Config.RedisPrefix+":ec2:"+*instance.EC2.Instances[0].InstanceId, d, 0).Err()
 	if err != nil {
 		logrus.WithField("func", "SaveData").Error("Could not save data in Redis: ", err.Error())
 	}

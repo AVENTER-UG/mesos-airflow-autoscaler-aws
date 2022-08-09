@@ -2,6 +2,8 @@ package types
 
 import (
 	"time"
+
+	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 // Config hold the configuration of these software
@@ -9,6 +11,7 @@ type Config struct {
 	MinVersion            string
 	EnableSyslog          bool
 	AirflowMesosScheduler string
+	AirflowMesosName      string
 	LogLevel              string
 	AppName               string
 	Wait                  string
@@ -53,7 +56,7 @@ type MesosAgentState struct {
 	GitSha       string   `json:"git_sha"`
 	GitTag       string   `json:"git_tag"`
 	BuildDate    string   `json:"build_date"`
-	BuildTime    int      `json:"build_time"`
+	BuildTime    float64  `json:"build_time"`
 	BuildUser    string   `json:"build_user"`
 	StartTime    float64  `json:"start_time"`
 	ID           string   `json:"id"`
@@ -61,20 +64,20 @@ type MesosAgentState struct {
 	Hostname     string   `json:"hostname"`
 	Capabilities []string `json:"capabilities"`
 	Resources    struct {
-		Disk  int    `json:"disk"`
-		Mem   int    `json:"mem"`
-		Gpus  int    `json:"gpus"`
-		Cpus  int    `json:"cpus"`
-		Ports string `json:"ports"`
+		Disk  float64 `json:"disk"`
+		Mem   float64 `json:"mem"`
+		Gpus  float64 `json:"gpus"`
+		Cpus  float64 `json:"cpus"`
+		Ports string  `json:"ports"`
 	} `json:"resources"`
 	ReservedResources struct {
 	} `json:"reserved_resources"`
 	UnreservedResources struct {
-		Disk  int    `json:"disk"`
-		Mem   int    `json:"mem"`
-		Gpus  int    `json:"gpus"`
-		Cpus  int    `json:"cpus"`
-		Ports string `json:"ports"`
+		Disk  float64 `json:"disk"`
+		Mem   float64 `json:"mem"`
+		Gpus  float64 `json:"gpus"`
+		Cpus  float64 `json:"cpus"`
+		Ports string  `json:"ports"`
 	} `json:"unreserved_resources"`
 	ReservedResourcesFull struct {
 	} `json:"reserved_resources_full"`
@@ -82,7 +85,7 @@ type MesosAgentState struct {
 		Name   string `json:"name"`
 		Type   string `json:"type"`
 		Scalar struct {
-			Value int `json:"value"`
+			Value float64 `json:"value"`
 		} `json:"scalar,omitempty"`
 		Role   string `json:"role"`
 		Ranges struct {
@@ -95,9 +98,9 @@ type MesosAgentState struct {
 	ReservedResourcesAllocated struct {
 	} `json:"reserved_resources_allocated"`
 	UnreservedResourcesAllocated struct {
-		Disk  int     `json:"disk"`
-		Mem   int     `json:"mem"`
-		Gpus  int     `json:"gpus"`
+		Disk  float64 `json:"disk"`
+		Mem   float64 `json:"mem"`
+		Gpus  float64 `json:"gpus"`
 		Cpus  float64 `json:"cpus"`
 		Ports string  `json:"ports"`
 	} `json:"unreserved_resources_allocated"`
@@ -196,14 +199,14 @@ type MesosAgentState struct {
 		ZkSessionTimeout                  string `json:"zk_session_timeout"`
 	} `json:"flags"`
 	Frameworks []struct {
-		ID              string `json:"id"`
-		Name            string `json:"name"`
-		User            string `json:"user"`
-		FailoverTimeout int    `json:"failover_timeout"`
-		Checkpoint      bool   `json:"checkpoint"`
-		Hostname        string `json:"hostname"`
-		Principal       string `json:"principal"`
-		Role            string `json:"role"`
+		ID              string  `json:"id"`
+		Name            string  `json:"name"`
+		User            string  `json:"user"`
+		FailoverTimeout float64 `json:"failover_timeout"`
+		Checkpoint      bool    `json:"checkpoint"`
+		Hostname        string  `json:"hostname"`
+		Principal       string  `json:"principal"`
+		Role            string  `json:"role"`
 		Executors       []struct {
 			ID        string `json:"id"`
 			Name      string `json:"name"`
@@ -211,9 +214,9 @@ type MesosAgentState struct {
 			Container string `json:"container"`
 			Directory string `json:"directory"`
 			Resources struct {
-				Disk  int     `json:"disk"`
-				Mem   int     `json:"mem"`
-				Gpus  int     `json:"gpus"`
+				Disk  float64 `json:"disk"`
+				Mem   float64 `json:"mem"`
+				Gpus  float64 `json:"gpus"`
 				Cpus  float64 `json:"cpus"`
 				Ports string  `json:"ports"`
 			} `json:"resources"`
@@ -226,9 +229,9 @@ type MesosAgentState struct {
 				SlaveID     string `json:"slave_id"`
 				State       string `json:"state"`
 				Resources   struct {
-					Disk  int     `json:"disk"`
-					Mem   int     `json:"mem"`
-					Gpus  int     `json:"gpus"`
+					Disk  float64 `json:"disk"`
+					Mem   float64 `json:"mem"`
+					Gpus  float64 `json:"gpus"`
 					Cpus  float64 `json:"cpus"`
 					Ports string  `json:"ports"`
 				} `json:"resources"`
@@ -291,7 +294,7 @@ type MesosAgentState struct {
 		ID                 string        `json:"id"`
 		Name               string        `json:"name"`
 		User               string        `json:"user"`
-		FailoverTimeout    int           `json:"failover_timeout"`
+		FailoverTimeout    float64       `json:"failover_timeout"`
 		Checkpoint         bool          `json:"checkpoint"`
 		Hostname           string        `json:"hostname"`
 		Principal          string        `json:"principal,omitempty"`
@@ -304,9 +307,9 @@ type MesosAgentState struct {
 			Container string `json:"container"`
 			Directory string `json:"directory"`
 			Resources struct {
-				Disk int     `json:"disk"`
-				Mem  int     `json:"mem"`
-				Gpus int     `json:"gpus"`
+				Disk float64 `json:"disk"`
+				Mem  float64 `json:"mem"`
+				Gpus float64 `json:"gpus"`
 				Cpus float64 `json:"cpus"`
 			} `json:"resources"`
 			Role   string `json:"role"`
@@ -324,9 +327,9 @@ type MesosAgentState struct {
 				SlaveID     string `json:"slave_id"`
 				State       string `json:"state"`
 				Resources   struct {
-					Disk int     `json:"disk"`
-					Mem  int     `json:"mem"`
-					Gpus int     `json:"gpus"`
+					Disk float64 `json:"disk"`
+					Mem  float64 `json:"mem"`
+					Gpus float64 `json:"gpus"`
 					Cpus float64 `json:"cpus"`
 				} `json:"resources"`
 				Role     string `json:"role"`
@@ -378,4 +381,10 @@ type MesosAgentState struct {
 			} `json:"completed_tasks"`
 		} `json:"completed_executors"`
 	} `json:"completed_frameworks"`
+}
+
+type EC2Struct struct {
+	EC2          *ec2.Reservation
+	AgentTimeout int  `default:"0"`
+	Check        bool `efault:"false"`
 }
