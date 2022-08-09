@@ -101,7 +101,7 @@ func (e *Scheduler) getDags() {
 		return
 	}
 
-	logrus.Info("Get Data from Mesos")
+	logrus.WithField("func", "getDags").Info("Get Data from Mesos")
 	var dags []cfg.DagTask
 	err = json.NewDecoder(res.Body).Decode(&dags)
 	if err != nil {
@@ -145,7 +145,7 @@ func (e *Scheduler) checkEC2Instance() {
 		}
 
 		client := &http.Client{
-			Timeout: 2 * time.Second,
+			Timeout: 60 * time.Second,
 		}
 		client.Transport = &http.Transport{
 			// #nosec G402

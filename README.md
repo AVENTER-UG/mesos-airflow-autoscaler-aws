@@ -2,6 +2,14 @@
 
 This AWS autoscaler will start EC2 instances if Airflow does not get matched offers from mesos.
 
+## Requirements
+
+- Airflow min 2.1.x
+- Apache Mesos min 1.6.x
+- Airflow Mesos Provider min 2.0
+- AWS
+
+
 ## Configuration
 
 | ENV | Default | Description |
