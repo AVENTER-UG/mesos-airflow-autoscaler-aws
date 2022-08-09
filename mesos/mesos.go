@@ -44,9 +44,18 @@ func (e *Scheduler) EventLoop() {
 
 			for _, i := range data {
 				// get execution time of dag task
+				logrus.WithField("func", "EventLoop").Debug(i.RunID)
 
-				timeStr := strings.Split(i.RunID, "__")
-				timeTask, err := time.Parse(time.RFC3339, timeStr[1])
+				var err error
+				var timeTask time.Time
+				if strings.Contains(i.RunID, "__") {
+					timeStr := strings.Split(i.RunID, "__")
+					timeTask, err = time.Parse(time.RFC3339, timeStr[1])
+				} else {
+					// airflow < v2.2.0 support
+					i.RunID = strings.ReplaceAll(i.RunID, " ", "T")
+					timeTask, err = time.Parse(time.RFC3339, i.RunID)
+				}
 
 				// get current time
 				timeNow := time.Now()
