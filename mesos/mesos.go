@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	mesosaws "github.com/AVENTER-UG/mesos-autoscale/aws"
@@ -40,71 +39,46 @@ func (e *Scheduler) EventLoop() {
 	for {
 		select {
 		case <-ticker.C:
-			data := e.getDags()
+			// connect to the scheduler and read all dags
+			e.getDags()
 
-			for _, i := range data {
-				// get execution time of dag task
-				logrus.WithField("func", "EventLoop").Debug(i.RunID)
+			// check if we have to scale out instances
+			e.checkDags()
 
-				var err error
-				var timeTask time.Time
-				if strings.Contains(i.RunID, "__") {
-					timeStr := strings.Split(i.RunID, "__")
-					timeTask, err = time.Parse(time.RFC3339, timeStr[1])
-				} else {
-					// airflow < v2.2.0 support
-					i.RunID = strings.ReplaceAll(i.RunID, " ", "T")
-					timeTask, err = time.Parse(time.RFC3339, i.RunID)
-				}
-
-				// get current time
-				timeNow := time.Now()
-				timeDiff := timeNow.Sub(timeTask).Seconds()
-
-				if err != nil {
-					logrus.WithField("func", "EventLoop").Error("Cannot parse TimeStamp: ", err.Error())
-					continue
-				}
-				logrus.WithField("func", "EventLoop").Debug("Dag ID: ", i.DagID)
-				logrus.WithField("func", "EventLoop").Debug("Dag Task ID: ", i.TaskID)
-				logrus.WithField("func", "EventLoop").Debug("Dag Run ID: ", i.RunID)
-				logrus.WithField("func", "EventLoop").Debug("Dag TryNumber: ", strconv.Itoa(i.TryNumber))
-				logrus.WithField("func", "EventLoop").Debug("Dag Task Age: ", timeDiff)
-				logrus.WithField("func", "EventLoop").Debug("Dag CPUs: ", i.MesosExecutor.Cpus)
-				logrus.WithField("func", "EventLoop").Debug("Dag MEM: ", i.MesosExecutor.MemLimit)
-				logrus.WithField("func", "EventLoop").Debug("ASG: ", i.ASG)
-				logrus.WithField("func", "EventLoop").Debug("---------------------------------------")
-
-				// check if the runID already exist
-				sTask := e.Redis.GetTaskFromRunID(e.Config.RedisPrefix + ":dags:" + i.DagID + ":" + i.TaskID + ":" + i.RunID + ":" + strconv.Itoa(i.TryNumber))
-				if sTask != nil {
-					i = *sTask
-					logrus.WithField("func", "EventLoop").Debug("=== ASG Already ")
-				} else {
-					if timeDiff >= e.Config.WaitTimeout.Seconds() {
-						logrus.WithField("func", "EventLoop").Debug(">>> ASG ScaleUp ")
-						i.ASG = true
-
-						if i.MesosExecutor.MemLimit >= 32768 {
-							go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance64))
-						} else if i.MesosExecutor.MemLimit >= 16384 {
-							go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance32))
-						} else {
-							go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance16))
-						}
-						e.Redis.SaveDagTaskRedis(i)
-					}
-				}
-
-			}
 			// Check if we can terminate the ec2 instances
 			go e.checkEC2Instance()
 		}
 	}
 }
 
+// check if we have to scale out instances
+func (e *Scheduler) checkDags() {
+	logrus.WithField("func", "checkDags").Info("Check DAGs")
+	keys := e.Redis.GetAllRedisKeys(e.Config.RedisPrefix + ":dags:*")
+	for keys.Next(e.Redis.RedisCTX) {
+		logrus.WithField("func", "checkDags").Debug("DAG: ", keys.Val())
+		i := e.Redis.GetTaskFromRunID(keys.Val())
+
+		timeDiff := time.Now().Sub(i.StartDate).Seconds()
+		if timeDiff >= e.Config.WaitTimeout.Seconds() && i.ASG == false {
+			logrus.WithField("func", "checkDags").Info("ScaleOut Mesos")
+			i.ASG = true
+			e.Redis.SaveDagTaskRedis(*i)
+
+			if i.MesosExecutor.MemLimit >= 32768 {
+				go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance64))
+			} else if i.MesosExecutor.MemLimit >= 16384 {
+				go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance32))
+			} else {
+				go e.Redis.SaveEC2InstanceRedis(e.AWS.CreateInstance(e.Config.AWSInstance16))
+			}
+
+		}
+	}
+}
+
 // get all running dags from airflow mesos scheduler
-func (e *Scheduler) getDags() []cfg.DagTask {
+func (e *Scheduler) getDags() {
 	client := &http.Client{}
 	client.Transport = &http.Transport{
 		// #nosec G402
@@ -118,13 +92,13 @@ func (e *Scheduler) getDags() []cfg.DagTask {
 
 	if err != nil {
 		logrus.WithField("func", "getDags").Error("Could not get Dags from airflow: ", err.Error())
-		return nil
+		return
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		logrus.WithField("func", "getDags").Error("Status Code not 200: ", res.StatusCode)
-		return nil
+		return
 	}
 
 	logrus.Info("Get Data from Mesos")
@@ -132,9 +106,25 @@ func (e *Scheduler) getDags() []cfg.DagTask {
 	err = json.NewDecoder(res.Body).Decode(&dags)
 	if err != nil {
 		logrus.WithField("func", "getDags").Error("Cannot decode json: ", err.Error())
-		return nil
+		return
 	}
-	return dags
+
+	for _, i := range dags {
+		sTask := e.Redis.GetTaskFromRunID(e.Config.RedisPrefix + ":dags:" + i.DagID + ":" + i.TaskID + ":" + i.RunID + ":" + strconv.Itoa(i.TryNumber))
+		if sTask == nil {
+			i.StartDate = time.Now()
+			e.Redis.SaveDagTaskRedis(i)
+			logrus.WithField("func", "EventLoop").Debug("Dag ID: ", i.DagID)
+			logrus.WithField("func", "EventLoop").Debug("Dag Task ID: ", i.TaskID)
+			logrus.WithField("func", "EventLoop").Debug("Dag Run ID: ", i.RunID)
+			logrus.WithField("func", "EventLoop").Debug("Dag TryNumber: ", strconv.Itoa(i.TryNumber))
+			logrus.WithField("func", "EventLoop").Debug("Dag StartDate: ", i.StartDate)
+			logrus.WithField("func", "EventLoop").Debug("Dag CPUs: ", i.MesosExecutor.Cpus)
+			logrus.WithField("func", "EventLoop").Debug("Dag MEM: ", i.MesosExecutor.MemLimit)
+			logrus.WithField("func", "EventLoop").Debug("ASG: ", i.ASG)
+			logrus.WithField("func", "EventLoop").Debug("---------------------------------------")
+		}
+	}
 }
 
 // check if the ec2 instance still running mesos tasks
