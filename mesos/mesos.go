@@ -154,7 +154,7 @@ func (e *Scheduler) checkEC2Instance() {
 			e.Redis.SaveEC2InstanceRedis(*instance)
 
 			client := &http.Client{
-				Timeout: 5 * time.Minute,
+				Timeout: e.Config.MesosAgentTimeout,
 			}
 			client.Transport = &http.Transport{
 				// #nosec G402

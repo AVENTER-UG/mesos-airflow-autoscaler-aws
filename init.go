@@ -18,7 +18,6 @@ func init() {
 	config.AirflowMesosScheduler = util.Getenv("AIRFLOW_MESOS_SCHEDULER", "127.0.0.1:11000")
 	config.AirflowMesosName = util.Getenv("AIRFLOW_MESOS_NAME", "Airflow")
 	config.LogLevel = util.Getenv("LOGLEVEL", "debug")
-	config.Wait = util.Getenv("WAIT_TIME", "2m")
 	config.AWSWait = util.Getenv("AWS_WAIT_TIME", "10m")
 	config.AppName = "AWS Autoscale for Apache Airflow"
 	config.RedisServer = util.Getenv("REDIS_SERVER", "127.0.0.1:6480")
@@ -35,14 +34,19 @@ func init() {
 	config.MesosAgentUsername = os.Getenv("MESOS_AGENT_USERNAME")
 	config.MesosAgentPassword = os.Getenv("MESOS_AGENT_PASSWORD")
 	config.MesosAgentPort = util.Getenv("MESOS_AGENT_PORT", "5051")
-	config.PollInterval = 5 * time.Second
-	config.PollTimeout = 10 * time.Second
+
+	// set pollinterval
+	config.PollInterval, _ = time.ParseDuration(util.Getenv("POLL_INTERVALL", "2s"))
+	config.PollTimeout, _ = time.ParseDuration(util.Getenv("POLL_TIMEOUT", "10s"))
 
 	// set the time to wait that the dag is running until we scale up AWS
-	config.WaitTimeout, _ = time.ParseDuration(config.Wait)
+	config.WaitTimeout, _ = time.ParseDuration(util.Getenv("WAIT_TIME", "2m"))
 
 	// set the time to wait until we will check if we can terminte the ec2 instance
 	config.AWSTerminateWait, _ = time.ParseDuration(config.AWSWait)
+
+	// set mesos agent timeout
+	config.MesosAgentTimeout, _ = time.ParseDuration(util.Getenv("MESOS_AGENT_TIMEOUT", "10m"))
 
 	if strings.Compare(util.Getenv("SSL", "false"), "true") == 0 {
 		config.SSL = true

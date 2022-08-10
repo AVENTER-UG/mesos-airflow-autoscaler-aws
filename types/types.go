@@ -14,7 +14,6 @@ type Config struct {
 	AirflowMesosName      string
 	LogLevel              string
 	AppName               string
-	Wait                  string
 	AWSWait               string
 	SSL                   bool
 	SkipSSL               bool
@@ -37,6 +36,7 @@ type Config struct {
 	MesosAgentPassword    string
 	MesosAgentPort        string
 	MesosAgentSSL         bool
+	MesosAgentTimeout     time.Duration
 }
 
 type DagTask struct {
@@ -90,8 +90,8 @@ type MesosAgentState struct {
 		Role   string `json:"role"`
 		Ranges struct {
 			Range []struct {
-				Begin int `json:"begin"`
-				End   int `json:"end"`
+				Begin uint32 `json:"begin"`
+				End   uint32 `json:"end"`
 			} `json:"range"`
 		} `json:"ranges,omitempty"`
 	} `json:"unreserved_resources_full"`
@@ -256,7 +256,7 @@ type MesosAgentState struct {
 					Name       string `json:"name"`
 					Ports      struct {
 						Ports []struct {
-							Number   int    `json:"number"`
+							Number   uint32 `json:"number"`
 							Name     string `json:"name"`
 							Protocol string `json:"protocol"`
 						} `json:"ports"`
@@ -269,8 +269,8 @@ type MesosAgentState struct {
 						Image        string `json:"image"`
 						Network      string `json:"network"`
 						PortMappings []struct {
-							HostPort      int    `json:"host_port"`
-							ContainerPort int    `json:"container_port"`
+							HostPort      uint32 `json:"host_port"`
+							ContainerPort uint32 `json:"container_port"`
 							Protocol      string `json:"protocol"`
 						} `json:"port_mappings"`
 						Privileged bool `json:"privileged"`

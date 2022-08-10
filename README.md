@@ -31,6 +31,10 @@ This AWS autoscaler will start EC2 instances if Airflow does not get matched off
 | AWS_INSTANCE_32GB | t3.2xlarge | The scale out instance type for memory limit gt 32GB |
 | AWS_INSTANCE_64GB | r5.2xlarge | The scale out instance type for memory limit gt 64GB |
 | MESOS_AGENT_SSL | false | Enable SSL for the communication to the Mesos agent |
+| MESOS_AGENT_USERNAME | | Username of the Mesos Agent |
+| MESOS_AGENT_PASSWORD | | Password of the Mesos Agent |
+| MESOS_AGENT_PORT | 5051 | Port of the Mesos Agent |
+| MESOS_AGENT_TIMEOUT | 10m | Mesos agent timeout |
 | SSL | false | Enable SSL for the communication to the Airflow Scheduler API |
 
 
