@@ -105,6 +105,215 @@
    "purl": "pkg:golang/github.com/aws/aws-sdk-go@v1.44.67"
   },
   {
+   "id": "693f37e6ca66d6f9",
+   "name": "github.com/aws/aws-sdk-go-v2",
+   "version": "v1.16.8",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2:v1.16.8:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2:v1.16.8:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2@v1.16.8"
+  },
+  {
+   "id": "23b1239c0fd87fb9",
+   "name": "github.com/aws/aws-sdk-go-v2/config",
+   "version": "v1.15.15",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2\\/config:v1.15.15:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2\\/config:v1.15.15:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2/config@v1.15.15"
+  },
+  {
+   "id": "3744def404b74f9b",
+   "name": "github.com/aws/aws-sdk-go-v2/credentials",
+   "version": "v1.12.10",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2\\/credentials:v1.12.10:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2\\/credentials:v1.12.10:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2/credentials@v1.12.10"
+  },
+  {
+   "id": "7d31bbe1e2ee8bf",
+   "name": "github.com/aws/aws-sdk-go-v2/feature/ec2/imds",
+   "version": "v1.12.9",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2\\/feature\\/ec2\\/imds:v1.12.9:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2\\/feature\\/ec2\\/imds:v1.12.9:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2/feature/ec2/imds@v1.12.9"
+  },
+  {
+   "id": "fe8763e49e999f4",
+   "name": "github.com/aws/aws-sdk-go-v2/internal/configsources",
+   "version": "v1.1.15",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2\\/internal\\/configsources:v1.1.15:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2\\/internal\\/configsources:v1.1.15:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2/internal/configsources@v1.1.15"
+  },
+  {
+   "id": "7e74c51ef37a571a",
+   "name": "github.com/aws/aws-sdk-go-v2/internal/endpoints/v2",
+   "version": "v2.4.9",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2\\/internal\\/endpoints\\/v2:v2.4.9:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2\\/internal\\/endpoints\\/v2:v2.4.9:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2/internal/endpoints/v2@v2.4.9"
+  },
+  {
+   "id": "e4fa9323dbd4ea50",
+   "name": "github.com/aws/aws-sdk-go-v2/internal/ini",
+   "version": "v1.3.16",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2\\/internal\\/ini:v1.3.16:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2\\/internal\\/ini:v1.3.16:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2/internal/ini@v1.3.16"
+  },
+  {
+   "id": "f97385afb6cd5d5f",
+   "name": "github.com/aws/aws-sdk-go-v2/service/internal/presigned-url",
+   "version": "v1.9.9",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2\\/service\\/internal\\/presigned-url:v1.9.9:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2\\/service\\/internal\\/presigned_url:v1.9.9:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2/service/internal/presigned-url@v1.9.9"
+  },
+  {
+   "id": "99512f67e7018988",
+   "name": "github.com/aws/aws-sdk-go-v2/service/sso",
+   "version": "v1.11.13",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2\\/service\\/sso:v1.11.13:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2\\/service\\/sso:v1.11.13:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2/service/sso@v1.11.13"
+  },
+  {
+   "id": "529ad6afb8e60114",
+   "name": "github.com/aws/aws-sdk-go-v2/service/sts",
+   "version": "v1.16.10",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go-v2\\/service\\/sts:v1.16.10:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go_v2\\/service\\/sts:v1.16.10:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go-v2/service/sts@v1.16.10"
+  },
+  {
+   "id": "660e7722d5b42d25",
+   "name": "github.com/aws/smithy-go",
+   "version": "v1.12.0",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "go.mod"
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:smithy-go:v1.12.0:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:smithy_go:v1.12.0:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/smithy-go@v1.12.0"
+  },
+  {
    "id": "536c37e2dd530858",
    "name": "github.com/cespare/xxhash/v2",
    "version": "v2.1.2",
