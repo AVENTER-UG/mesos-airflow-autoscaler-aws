@@ -25,6 +25,7 @@ type Config struct {
 	RedisPassword         string
 	RedisDB               int
 	RedisPrefix           string
+	RedisTTL              time.Duration
 	APIUsername           string
 	APIPassword           string
 	AWSRegion             string

@@ -48,6 +48,9 @@ func init() {
 	// set mesos agent timeout
 	config.MesosAgentTimeout, _ = time.ParseDuration(util.Getenv("MESOS_AGENT_TIMEOUT", "10m"))
 
+	// set TTL for dags in redis
+	config.RedisTTL, _ = time.ParseDuration(util.Getenv("DAG_TTL", "6h"))
+
 	if strings.Compare(util.Getenv("SSL", "false"), "true") == 0 {
 		config.SSL = true
 	} else {

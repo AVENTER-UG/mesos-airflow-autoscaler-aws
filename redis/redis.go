@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"strconv"
+	"time"
 
 	cfg "github.com/AVENTER-UG/mesos-autoscale/types"
 	goredis "github.com/go-redis/redis/v8"
@@ -94,7 +95,7 @@ func (e *Redis) CountRedisKey(pattern string) int {
 // SaveTaskRedis store mesos task in DB
 func (e *Redis) SaveDagTaskRedis(task cfg.DagTask) {
 	d, _ := json.Marshal(&task)
-	e.SetRedisKey(d, task.DagID+":"+task.TaskID+":"+task.RunID+":"+strconv.Itoa(task.TryNumber))
+	e.SetRedisKey(d, task.DagID+":"+task.TaskID+":"+task.RunID+":"+strconv.Itoa(task.TryNumber), e.Config.RedisTTL)
 }
 
 // SaveEC2InstanceRedis store mesos task in DB
@@ -107,8 +108,8 @@ func (e *Redis) SaveEC2InstanceRedis(instance cfg.EC2Struct) {
 }
 
 // SetRedisKey store data in redis
-func (e *Redis) SetRedisKey(data []byte, key string) {
-	err := e.RedisClient.Set(e.RedisCTX, e.Config.RedisPrefix+":dags:"+key, data, 0).Err()
+func (e *Redis) SetRedisKey(data []byte, key string, exp time.Duration) {
+	err := e.RedisClient.Set(e.RedisCTX, e.Config.RedisPrefix+":dags:"+key, data, exp).Err()
 	if err != nil {
 		logrus.WithField("func", "SaveData").Error("Could not save data in Redis: ", err.Error())
 	}

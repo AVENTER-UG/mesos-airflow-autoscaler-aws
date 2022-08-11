@@ -19,7 +19,7 @@ This AWS autoscaler will start EC2 instances if Airflow does not get matched off
 | WAIT_TIME | 2m | The time in minutes the autoscaler have to wait until it will create a mesos instance in AWS |
 | REDIS_SERVER | 127.0.0.1:6480 | Redis server and port |
 | REDIS_PASSWORD | | Redis DB password |
-| REDIS_DB | 2 | Redis DB |
+| REDIS_DB | 2 | Redis DB Number |
 | REDIS_PREFIX | asg | Prefix for every Redis key |
 | API_USERNAME | user | Username to authenticate against the Apache Airflow Mesos provider |
 | API_PASSWORD | password | Password to authenticate against the Apache Airflow Mesos provider |
@@ -36,6 +36,7 @@ This AWS autoscaler will start EC2 instances if Airflow does not get matched off
 | MESOS_AGENT_PORT | 5051 | Port of the Mesos Agent |
 | MESOS_AGENT_TIMEOUT | 10m | Mesos agent timeout |
 | SSL | false | Enable SSL for the communication to the Airflow Scheduler API |
+| DAG_TTL | 6h | Set the TTL for DAG'keys in Redis. | 
 
 
 
