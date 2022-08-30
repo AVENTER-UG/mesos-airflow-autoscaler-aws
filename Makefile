@@ -3,9 +3,9 @@
 #vars
 IMAGENAME=mesos-airflow-autoscaler-aws
 REPO=avhost
-TAG=`git describe --tags --abbrev=0`
-BRANCH=`git rev-parse --abbrev-ref HEAD`
-BUILDDATE=`date -u +%Y-%m-%dT%H:%M:%SZ`
+BRANCH=${shell git rev-parse --abbrev-ref HEAD}
+TAG=latest
+BUILDDATE=${shell date -u +%Y-%m-%dT%H:%M:%SZ}
 IMAGEFULLNAME=${REPO}/${IMAGENAME}
 
 .PHONY: help build all docs
@@ -23,8 +23,8 @@ help:
 .DEFAULT_GOAL := all
 
 build:
-	@echo ">>>> Build docker image and publish it to private repo"
-	@docker buildx build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@echo ">>>> Build Docker"
+	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG} .
 
 build-bin:
 	@echo ">>>> Build binary"
@@ -32,9 +32,8 @@ build-bin:
 
 publish:
 	@echo ">>>> Publish docker image"
-	docker push ${IMAGEFULLNAME}:${BRANCH}
-	docker push ${IMAGEFULLNAME}:${TAG}
-	docker push ${IMAGEFULLNAME}:latest
+	@docker buildx build --push --platform linux/arm64,linux/amd64 --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG} .
+	@docker buildx build --push --platform linux/arm64,linux/amd64 --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
 
 update-gomod:
 	go get -u
