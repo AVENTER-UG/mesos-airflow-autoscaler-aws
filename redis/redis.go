@@ -61,7 +61,11 @@ func (e *Redis) GetTaskFromRunID(key string) *cfg.DagTask {
 	keys := e.GetRedisKey(key)
 	if len(keys) > 0 {
 		var task cfg.DagTask
-		json.Unmarshal([]byte(keys), &task)
+		err := json.Unmarshal([]byte(keys), &task)
+		if err != nil {
+			logrus.WithField("func", "redis.GetTaskFromRunID").Error("Could not unmarshal data: ", err.Error())
+			return &cfg.DagTask{}
+		}
 		return &task
 	}
 
@@ -74,7 +78,11 @@ func (e *Redis) GetEC2InstanceFromID(key string) *cfg.EC2Struct {
 	keys := e.GetRedisKey(key)
 	if len(keys) > 0 {
 		var instance *cfg.EC2Struct
-		json.Unmarshal([]byte(keys), &instance)
+		err := json.Unmarshal([]byte(keys), &instance)
+		if err != nil {
+			logrus.WithField("func", "redis.GetTaskFromRunID").Error("Could not unmarshal data: ", err.Error())
+			return &cfg.EC2Struct{}
+		}
 		return instance
 	}
 
@@ -92,7 +100,7 @@ func (e *Redis) CountRedisKey(pattern string) int {
 	return count
 }
 
-// SaveTaskRedis store mesos task in DB
+// SaveDagTaskRedis store mesos task in DB
 func (e *Redis) SaveDagTaskRedis(task cfg.DagTask) {
 	d, _ := json.Marshal(&task)
 	e.SetRedisKey(d, task.DagID+":"+task.TaskID+":"+task.RunID+":"+strconv.Itoa(task.TryNumber), e.Config.RedisTTL)

@@ -37,18 +37,15 @@ func New(cfg *cfg.Config) *Scheduler {
 func (e *Scheduler) EventLoop() {
 	ticker := time.NewTicker(e.Config.PollInterval)
 	defer ticker.Stop()
-	for {
-		select {
-		case <-ticker.C:
-			// connect to the scheduler and read all dags
-			e.getDags()
+	for ; true; <-ticker.C {
+		// connect to the scheduler and read all dags
+		e.getDags()
 
-			// check if we have to scale out instances
-			e.checkDags()
+		// check if we have to scale out instances
+		e.checkDags()
 
-			// Check if we can terminate the ec2 instances
-			go e.checkEC2Instance()
-		}
+		// Check if we can terminate the ec2 instances
+		go e.checkEC2Instance()
 	}
 }
 
@@ -59,8 +56,8 @@ func (e *Scheduler) checkDags() {
 		logrus.WithField("func", "checkDags").Debug("DAG: ", keys.Val())
 		i := e.Redis.GetTaskFromRunID(keys.Val())
 
-		timeDiff := time.Now().Sub(i.StartDate).Seconds()
-		if timeDiff >= e.Config.WaitTimeout.Seconds() && i.ASG == false {
+		timeDiff := time.Since(i.StartDate).Seconds()
+		if timeDiff >= e.Config.WaitTimeout.Seconds() && !i.ASG {
 			logrus.WithField("func", "checkDags").Info("ScaleOut Mesos")
 			i.ASG = true
 			e.Redis.SaveDagTaskRedis(*i)
@@ -177,9 +174,8 @@ func (e *Scheduler) checkEC2Instance() {
 			if err != nil {
 				logrus.WithField("func", "checkEC2Instances").Error("Could not connect to agent: ", err.Error())
 				instance.Check = false
-				// increase the error counter
-				instance.AgentTimeout = instance.AgentTimeout + 1
-				e.Redis.SaveEC2InstanceRedis(*instance)
+				e.AWS.TerminateInstance(instance.EC2.Instances[0].InstanceId)
+				e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.EC2.Instances[0].InstanceId)
 				continue
 			}
 
@@ -214,7 +210,7 @@ func (e *Scheduler) checkEC2Instance() {
 // check if there is still a airflow job running
 func (e *Scheduler) isFrameworkName(agent cfg.MesosAgentState) bool {
 	for _, framework := range agent.Frameworks {
-		if strings.ToLower(framework.Name) == strings.ToLower(e.Config.AirflowMesosName) {
+		if strings.EqualFold(framework.Name, e.Config.AirflowMesosName) {
 			return true
 		}
 	}
