@@ -53,12 +53,11 @@ func (e *Scheduler) EventLoop() {
 func (e *Scheduler) checkDags() {
 	keys := e.Redis.GetAllRedisKeys(e.Config.RedisPrefix + ":dags:*")
 	for keys.Next(e.Redis.RedisCTX) {
-		logrus.WithField("func", "checkDags").Debug("DAG: ", keys.Val())
 		i := e.Redis.GetTaskFromRunID(keys.Val())
 
 		timeDiff := time.Since(i.StartDate).Seconds()
 		if timeDiff >= e.Config.WaitTimeout.Seconds() && !i.ASG {
-			logrus.WithField("func", "checkDags").Info("ScaleOut Mesos")
+			logrus.WithField("func", "checkDags").Info("ScaleOut Mesos: ", i.RunID)
 			i.ASG = true
 			e.Redis.SaveDagTaskRedis(*i)
 
@@ -132,6 +131,10 @@ func (e *Scheduler) checkEC2Instance() {
 	keys := e.Redis.GetAllRedisKeys(e.Config.RedisPrefix + ":ec2:*")
 	for keys.Next(e.Redis.RedisCTX) {
 		instance := e.Redis.GetEC2InstanceFromID(keys.Val())
+		if len(instance.EC2.Instances) <= 0 {
+			logrus.WithField("func", "checkEC2Instance").Debug("Didnt got instances")
+			return
+		}
 
 		// Only check if there is not already a check running
 		if !instance.Check {

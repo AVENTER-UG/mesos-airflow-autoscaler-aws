@@ -108,10 +108,14 @@ func (e *Redis) SaveDagTaskRedis(task cfg.DagTask) {
 
 // SaveEC2InstanceRedis store mesos task in DB
 func (e *Redis) SaveEC2InstanceRedis(instance cfg.EC2Struct) {
-	d, _ := json.Marshal(&instance)
-	err := e.RedisClient.Set(e.RedisCTX, e.Config.RedisPrefix+":ec2:"+*instance.EC2.Instances[0].InstanceId, d, 0).Err()
-	if err != nil {
-		logrus.WithField("func", "SaveData").Error("Could not save data in Redis: ", err.Error())
+	if len(instance.EC2.Instances) > 0 {
+		d, _ := json.Marshal(&instance)
+		err := e.RedisClient.Set(e.RedisCTX, e.Config.RedisPrefix+":ec2:"+*instance.EC2.Instances[0].InstanceId, d, 0).Err()
+		if err != nil {
+			logrus.WithField("func", "SaveData").Error("Could not save data in Redis: ", err.Error())
+		}
+	} else {
+		logrus.WithField("func", "redis.SaveEC2InstanceRedis").Debug("Didnt got instances")
 	}
 }
 
