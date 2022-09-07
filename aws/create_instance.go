@@ -1,11 +1,14 @@
 package mesosaws
 
 import (
+	"strings"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/sirupsen/logrus"
 )
 
+// CreateInstance - Create a AWS instance
 func (e *AWS) CreateInstance(instanceType string) *ec2.Reservation {
 	// Create EC2 service client
 	e.SVC = ec2.New(e.Session)
@@ -22,10 +25,15 @@ func (e *AWS) CreateInstance(instanceType string) *ec2.Reservation {
 	})
 
 	if err != nil {
-		logrus.WithField("func", "CreateInstance").Error("Could not create instance: ", err.Error())
+		// create fallback instance if the AWS capacity is not enough
+		if strings.Contains(err.Error(), "InsufficientInstanceCapacity") {
+			logrus.WithField("func", "mesosaws.CreateInstance").Info("Insufficient instance capacity. Try to create fallback instance.")
+			return e.CreateInstance(e.Config.AWSInstanceFallback)
+		}
+		logrus.WithField("func", "mesosaws.CreateInstance").Error("Could not create instance: ", err.Error())
 		return &ec2.Reservation{}
 	}
 
-	logrus.WithField("func", "CreateInstance").Info("Created Instance: ", *runResult.Instances[0].InstanceId)
+	logrus.WithField("func", "mesosaws.CreateInstance").Info("Created Instance: ", *runResult.Instances[0].InstanceId)
 	return runResult
 }

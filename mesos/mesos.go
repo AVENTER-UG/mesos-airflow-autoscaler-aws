@@ -129,11 +129,16 @@ func (e *Scheduler) getDags() {
 // check if the ec2 instance still running mesos tasks
 func (e *Scheduler) checkEC2Instance() {
 	keys := e.Redis.GetAllRedisKeys(e.Config.RedisPrefix + ":ec2:*")
+	// instance count for summary
+	i := 0
+	// instances in check mode for summary
+	c := 0
 	for keys.Next(e.Redis.RedisCTX) {
+		i++
 		instance := e.Redis.GetEC2InstanceFromID(keys.Val())
 		if len(instance.EC2.Instances) <= 0 {
 			logrus.WithField("func", "checkEC2Instance").Debug("Didnt got instances")
-			return
+			continue
 		}
 
 		// Only check if there is not already a check running
@@ -147,7 +152,7 @@ func (e *Scheduler) checkEC2Instance() {
 				continue
 			}
 
-			logrus.WithField("func", "checkEC2Instance").Info("Instances: ", keys.Val())
+			c++
 
 			// set check state to true
 			instance.Check = true
@@ -207,6 +212,9 @@ func (e *Scheduler) checkEC2Instance() {
 				e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.EC2.Instances[0].InstanceId)
 			}
 		}
+	}
+	if i > 0 {
+		logrus.WithField("func", "mesos.checkEC2Instance").Infof("There are %d instances in DB. %d of them are in check mode.", i, c)
 	}
 }
 

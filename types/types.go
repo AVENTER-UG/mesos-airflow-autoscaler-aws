@@ -32,6 +32,7 @@ type Config struct {
 	AWSInstance16         string
 	AWSInstance32         string
 	AWSInstance64         string
+	AWSInstanceFallback   string
 	AWSLaunchTemplateID   string
 	MesosAgentUsername    string
 	MesosAgentPassword    string
@@ -40,6 +41,7 @@ type Config struct {
 	MesosAgentTimeout     time.Duration
 }
 
+// DagTask - Hold the structure of the Dag
 type DagTask struct {
 	DagID         string `json:"dag_id"`
 	TaskID        string `json:"task_id"`
@@ -52,6 +54,8 @@ type DagTask struct {
 		MemLimit int     `json:"mem_limit" default:"2048"`
 	} `json:"MesosExecutor"`
 }
+
+// MesosAgentState - Hold the Agents JSON from mesos
 type MesosAgentState struct {
 	Version      string   `json:"version"`
 	GitSha       string   `json:"git_sha"`
@@ -384,6 +388,7 @@ type MesosAgentState struct {
 	} `json:"completed_frameworks"`
 }
 
+// EC2Struct - Hold the strucute of the EC2 Instances
 type EC2Struct struct {
 	EC2          *ec2.Reservation
 	AgentTimeout int  `default:"0"`

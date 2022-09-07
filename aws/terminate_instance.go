@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// TerminateInstance - Terminate a running instance
 func (e *AWS) TerminateInstance(instance *string) {
 	// Create EC2 service client
 	e.SVC = ec2.New(e.Session)
@@ -17,9 +18,9 @@ func (e *AWS) TerminateInstance(instance *string) {
 	runResult, err := e.SVC.TerminateInstances(input)
 
 	if err != nil {
-		logrus.WithField("func", "TerminateInstance").Error("Could not terminate instance: ", err.Error())
+		logrus.WithField("func", "mesosaws.TerminateInstance").Error("Could not terminate instance: ", err.Error())
 		return
 	}
 
-	logrus.WithField("func", "TerminateInstance").Info(*runResult)
+	logrus.WithField("func", "mesosaws.TerminateInstance").Infof("Terminate instance %s State: %s", *runResult.TerminatingInstances[0].InstanceId, *runResult.TerminatingInstances[0].CurrentState)
 }

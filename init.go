@@ -15,25 +15,26 @@ var config cfg.Config
 
 func init() {
 
-	config.AirflowMesosScheduler = util.Getenv("AIRFLOW_MESOS_SCHEDULER", "127.0.0.1:11000")
-	config.AirflowMesosName = util.Getenv("AIRFLOW_MESOS_NAME", "Airflow")
-	config.LogLevel = util.Getenv("LOGLEVEL", "debug")
-	config.AWSWait = util.Getenv("AWS_WAIT_TIME", "10m")
 	config.AppName = "AWS Autoscale for Apache Airflow"
-	config.RedisServer = util.Getenv("REDIS_SERVER", "127.0.0.1:6480")
-	config.RedisPassword = os.Getenv("REDIS_PASSWORD")
-	config.RedisDB, _ = strconv.Atoi(util.Getenv("REDIS_DB", "2"))
-	config.RedisPrefix = util.Getenv("REDIS_PREFIX", "asg")
-	config.APIUsername = util.Getenv("API_USERNAME", "user")
-	config.APIPassword = util.Getenv("API_PASSWORD", "password")
+	config.AWSWait = util.Getenv("AWS_WAIT_TIME", "10m")
 	config.AWSLaunchTemplateID = os.Getenv("AWS_LAUNCH_TEMPLATE_ID")
 	config.AWSRegion = util.Getenv("AWS_REGION", "eu-central-1")
 	config.AWSInstance16 = util.Getenv("AWS_INSTANCE_16GB", "t2.xlarge")
 	config.AWSInstance32 = util.Getenv("AWS_INSTANCE_32GB", "t3.2xlarge")
 	config.AWSInstance64 = util.Getenv("AWS_INSTANCE_64GB", "r5.2xlarge")
+	config.AWSInstanceFallback = util.Getenv("AWS_INSTANCE_FALLBACK", "t3a.2xlarge")
+	config.AirflowMesosScheduler = util.Getenv("AIRFLOW_MESOS_SCHEDULER", "127.0.0.1:11000")
+	config.AirflowMesosName = util.Getenv("AIRFLOW_MESOS_NAME", "Airflow")
+	config.APIUsername = util.Getenv("API_USERNAME", "user")
+	config.APIPassword = util.Getenv("API_PASSWORD", "password")
+	config.LogLevel = util.Getenv("LOGLEVEL", "debug")
 	config.MesosAgentUsername = os.Getenv("MESOS_AGENT_USERNAME")
 	config.MesosAgentPassword = os.Getenv("MESOS_AGENT_PASSWORD")
 	config.MesosAgentPort = util.Getenv("MESOS_AGENT_PORT", "5051")
+	config.RedisServer = util.Getenv("REDIS_SERVER", "127.0.0.1:6480")
+	config.RedisPassword = os.Getenv("REDIS_PASSWORD")
+	config.RedisDB, _ = strconv.Atoi(util.Getenv("REDIS_DB", "2"))
+	config.RedisPrefix = util.Getenv("REDIS_PREFIX", "asg")
 
 	// set pollinterval
 	config.PollInterval, _ = time.ParseDuration(util.Getenv("POLL_INTERVALL", "2s"))
