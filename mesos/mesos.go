@@ -62,17 +62,21 @@ func (e *Scheduler) checkDags() {
 			e.Redis.SaveDagTaskRedis(*i)
 
 			var ec cfg.EC2Struct
-			if i.MesosExecutor.MemLimit >= 32768 {
-				ec.EC2 = e.AWS.CreateInstance(e.Config.AWSInstance64)
-				e.Redis.SaveEC2InstanceRedis(ec)
-			} else if i.MesosExecutor.MemLimit >= 16384 {
-				ec.EC2 = e.AWS.CreateInstance(e.Config.AWSInstance32)
+			if i.MesosExecutor.InstanceType != "" {
+				ec.EC2 = e.AWS.CreateInstance(i.MesosExecutor.InstanceType)
 				e.Redis.SaveEC2InstanceRedis(ec)
 			} else {
-				ec.EC2 = e.AWS.CreateInstance(e.Config.AWSInstance16)
-				e.Redis.SaveEC2InstanceRedis(ec)
+				if i.MesosExecutor.MemLimit >= 32768 {
+					ec.EC2 = e.AWS.CreateInstance(e.Config.AWSInstance64)
+					e.Redis.SaveEC2InstanceRedis(ec)
+				} else if i.MesosExecutor.MemLimit >= 16384 {
+					ec.EC2 = e.AWS.CreateInstance(e.Config.AWSInstance32)
+					e.Redis.SaveEC2InstanceRedis(ec)
+				} else {
+					ec.EC2 = e.AWS.CreateInstance(e.Config.AWSInstance16)
+					e.Redis.SaveEC2InstanceRedis(ec)
+				}
 			}
-
 		}
 	}
 }

@@ -38,7 +38,19 @@ This AWS autoscaler will start EC2 instances if Airflow does not get matched off
 | SSL | false | Enable SSL for the communication to the Airflow Scheduler API |
 | DAG_TTL | 6h | Set the TTL for DAG'keys in Redis. | 
 
+## Airflow Executor Config
 
+These autoscaler support the following executor config parameters:
+
+```bash
+  executor_config={
+    "mem_limit": 2048,
+    "instance_type": "t2.xlarge"
+ }
+```
+
+- With the help if the `mem_limit` parameter, the autoscaler will determin which AWS instance is the right one. 
+- `instance_type` will overwrite the mem_limit and just crate a instance of that type.
 
 ## Documentation
 

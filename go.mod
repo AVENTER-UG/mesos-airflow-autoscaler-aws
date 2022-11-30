@@ -6,6 +6,7 @@ require (
 	github.com/AVENTER-UG/mesos-util v0.0.30
 	github.com/AVENTER-UG/util v0.3.0
 	github.com/Showmax/go-fqdn v1.0.0
+	github.com/aws/aws-sdk-go v1.44.67
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang/protobuf v1.5.2
 	github.com/sirupsen/logrus v1.9.0
@@ -13,7 +14,6 @@ require (
 
 require (
 	github.com/AVENTER-UG/go-logrus-formatter v0.0.0-20181204170756-e4bb1d931585 // indirect
-	github.com/aws/aws-sdk-go v1.44.67 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.16.8 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.15.15 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.12.10 // indirect

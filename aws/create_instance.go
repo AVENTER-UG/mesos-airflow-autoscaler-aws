@@ -22,6 +22,25 @@ func (e *AWS) CreateInstance(instanceType string) *ec2.Reservation {
 		LaunchTemplate: &ec2.LaunchTemplateSpecification{
 			LaunchTemplateId: aws.String(e.Config.AWSLaunchTemplateID),
 		},
+		TagSpecifications: []*ec2.TagSpecification{
+			{
+				ResourceType: aws.String("instance"),
+				Tags: []*ec2.Tag{
+					{
+						Key:   aws.String("Groups"),
+						Value: aws.String("Worker"),
+					},
+					{
+						Key:   aws.String("Inventory"),
+						Value: aws.String("autoscaler"),
+					},
+					{
+						Key:   aws.String("InstanceType"),
+						Value: aws.String(instanceType),
+					},
+				},
+			},
+		},
 	})
 
 	if err != nil {

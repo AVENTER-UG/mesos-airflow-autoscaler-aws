@@ -50,8 +50,9 @@ type DagTask struct {
 	ASG           bool   `json:"ASG" default:"false"`
 	StartDate     time.Time
 	MesosExecutor struct {
-		Cpus     float64 `json:"cpus"`
-		MemLimit int     `json:"mem_limit" default:"2048"`
+		Cpus         float64 `json:"cpus"`
+		MemLimit     int     `json:"mem_limit" default:"2048"`
+		InstanceType string  `json:"instance_type"`
 	} `json:"MesosExecutor"`
 }
 
