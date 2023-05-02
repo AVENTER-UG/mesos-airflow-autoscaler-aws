@@ -40,5 +40,6 @@ func main() {
 	e := mesos.New(&config)
 	e.Redis = r
 	e.AWS = a
+	go e.HealthCheck()
 	e.EventLoop()
 }
