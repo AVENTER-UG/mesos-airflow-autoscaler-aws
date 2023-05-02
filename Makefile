@@ -7,6 +7,7 @@ BRANCH=${shell git rev-parse --abbrev-ref HEAD}
 TAG=latest
 BUILDDATE=${shell date -u +%Y-%m-%dT%H:%M:%SZ}
 IMAGEFULLNAME=${REPO}/${IMAGENAME}
+LASTCOMMIT=$(shell git log -1 --pretty=short | tail -n 1 | tr -d " ")
 
 .PHONY: help build all docs
 
@@ -22,19 +23,30 @@ help:
 
 .DEFAULT_GOAL := all
 
+ifeq (${BRANCH}, master) 
+	BRANCH=latest
+endif
+
+ifneq ($(shell echo $(LASTCOMMIT) | grep -E '^v([0-9]+\.){0,2}(\*|[0-9]+)'),)
+	BRANCH=${LASTCOMMIT}
+else
+	BRANCH=latest
+endif
+
 build:
-	@echo ">>>> Build Docker"
-	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG} .
+	@echo ">>>> Build Docker branch:" ${BRANCH}
+	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
 
 build-bin:
 	@echo ">>>> Build binary"
 	@CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags "-X main.BuildVersion=${BUILDDATE} -X main.GitVersion=${TAG} -extldflags \"-static\"" .
 
-publish:
+push:
 	@echo ">>>> Publish docker image"
-	@docker buildx create --use desktop-linux
-	@docker buildx build --push --platform linux/arm64,linux/amd64,linux/ppc64le --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG} .
-	@docker buildx build --push --platform linux/arm64,linux/amd64,linux/ppc64le --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
+	@docker buildx create --use --name buildkit
+	@docker buildx build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@docker buildx build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
+	@docker buildx rm buildkit
 
 update-gomod:
 	go get -u
@@ -49,7 +61,10 @@ sboom:
 	syft dir:. -o json > sbom.json
 
 seccheck:
-	gosec --exclude G104 --exclude-dir ./vendor ./... 
+	grype --add-cpes-if-none .
+
+go-fmt:
+	@gofmt -w .
 
 version:
 	@echo ">>>> Generate version file"
@@ -57,5 +72,5 @@ version:
 	@cat .version.json
 	@echo "Saved under .version.json"
 
-
-all: seccheck build version sboom publish
+check: go-fmt sboom seccheck
+all: check build version sboom push

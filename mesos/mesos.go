@@ -20,12 +20,14 @@ type Scheduler struct {
 	Config *cfg.Config
 	Redis  *redis.Redis
 	AWS    *mesosaws.AWS
+	Health bool
 }
 
 // New will create the Scheduler object
 func New(cfg *cfg.Config) *Scheduler {
 	e := &Scheduler{
 		Config: cfg,
+		Health: true,
 	}
 	// Add protocoll to the endpoint depends if SSL is enabled
 	logrus.Info("Connect Provider Apache Mesos Airflow Provider: ", e.Config.AirflowMesosScheduler)
@@ -38,14 +40,31 @@ func (e *Scheduler) EventLoop() {
 	ticker := time.NewTicker(e.Config.PollInterval)
 	defer ticker.Stop()
 	for ; true; <-ticker.C {
-		// connect to the scheduler and read all dags
-		e.getDags()
+		if e.Health {
+			// connect to the scheduler and read all dags
+			e.getDags()
 
-		// check if we have to scale out instances
-		e.checkDags()
+			// check if we have to scale out instances
+			e.checkDags()
 
-		// Check if we can terminate the ec2 instances
-		go e.checkEC2Instance()
+			// Check if we can terminate the ec2 instances
+			go e.checkEC2Instance()
+		}
+	}
+}
+
+// HealthCheck will check the health
+func (e *Scheduler) HealthCheck() {
+	ticker := time.NewTicker(e.Config.PollInterval)
+	defer ticker.Stop()
+	for ; true; <-ticker.C {
+		err := e.Redis.PingRedis()
+		if err != nil {
+			logrus.WithField("func", "mesos.HealthCheck").Error("Redis connection error:", err.Error())
+			e.Health = false
+		} else {
+			e.Health = true
+		}
 	}
 }
 
@@ -124,6 +143,7 @@ func (e *Scheduler) getDags() {
 			logrus.WithField("func", "EventLoop").Debug("Dag StartDate: ", i.StartDate)
 			logrus.WithField("func", "EventLoop").Debug("Dag CPUs: ", i.MesosExecutor.Cpus)
 			logrus.WithField("func", "EventLoop").Debug("Dag MEM: ", i.MesosExecutor.MemLimit)
+			logrus.WithField("func", "EventLoop").Debug("Dag InstanceType: ", i.MesosExecutor.InstanceType)
 			logrus.WithField("func", "EventLoop").Debug("ASG: ", i.ASG)
 			logrus.WithField("func", "EventLoop").Debug("---------------------------------------")
 		}
@@ -140,6 +160,9 @@ func (e *Scheduler) checkEC2Instance() {
 	for keys.Next(e.Redis.RedisCTX) {
 		i++
 		instance := e.Redis.GetEC2InstanceFromID(keys.Val())
+		if instance == nil {
+			return
+		}
 		if len(instance.EC2.Instances) <= 0 {
 			logrus.WithField("func", "checkEC2Instance").Debug("Didnt got instances")
 			continue
@@ -188,6 +211,10 @@ func (e *Scheduler) checkEC2Instance() {
 				instance.Check = false
 				e.AWS.TerminateInstance(instance.EC2.Instances[0].InstanceId)
 				e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.EC2.Instances[0].InstanceId)
+				// create a new instance
+				var ec cfg.EC2Struct
+				ec.EC2 = e.AWS.CreateInstance(*instance.EC2.Instances[0].InstanceType)
+				e.Redis.SaveEC2InstanceRedis(ec)
 				continue
 			}
 
