@@ -8,37 +8,50 @@ import (
 
 // Config hold the configuration of these software
 type Config struct {
-	MinVersion            string
-	EnableSyslog          bool
-	AirflowMesosScheduler string
-	AirflowMesosName      string
-	LogLevel              string
-	AppName               string
-	AWSWait               string
-	SSL                   bool
-	SkipSSL               bool
-	PollInterval          time.Duration
-	PollTimeout           time.Duration
-	WaitTimeout           time.Duration
-	AWSTerminateWait      time.Duration
-	RedisServer           string
-	RedisPassword         string
-	RedisDB               int
-	RedisPrefix           string
-	RedisTTL              time.Duration
-	APIUsername           string
-	APIPassword           string
-	AWSRegion             string
-	AWSInstance16         string
-	AWSInstance32         string
-	AWSInstance64         string
-	AWSInstanceFallback   string
-	AWSLaunchTemplateID   string
-	MesosAgentUsername    string
-	MesosAgentPassword    string
-	MesosAgentPort        string
-	MesosAgentSSL         bool
-	MesosAgentTimeout     time.Duration
+	MinVersion                     string
+	EnableSyslog                   bool
+	AirflowMesosScheduler          string
+	AirflowMesosName               string
+	LogLevel                       string
+	AppName                        string
+	AWSWait                        string
+	SSL                            bool
+	SkipSSL                        bool
+	PollInterval                   time.Duration
+	PollTimeout                    time.Duration
+	WaitTimeout                    time.Duration
+	WaitTimeoutOverwrite           time.Duration
+	AWSTerminateWait               time.Duration
+	RedisServer                    string
+	RedisPassword                  string
+	RedisDB                        int
+	RedisPrefix                    string
+	RedisTTL                       time.Duration
+	APIUsername                    string
+	APIPassword                    string
+	AWSRegion                      string
+	AWSInstanceDefaultArchitecture string
+	AWSInstanceFallback            string
+	AWSInstanceAllow               []InstanceTypes
+	AWSInstanceTerminate           bool
+	AWSLaunchTemplateID            string
+	MesosAgentUsername             string
+	MesosAgentPassword             string
+	MesosAgentPort                 string
+	MesosAgentSSL                  bool
+	MesosAgentTimeout              time.Duration
+	MesosMaster                    string
+	MesosMasterUsername            string
+	MesosMasterPassword            string
+	MesosMasterPort                string
+}
+
+// InstanceTypes keep a sorted list of allowd instance types
+type InstanceTypes struct {
+	Name string
+	CPU  int64
+	MEM  int64
+	Arch string
 }
 
 // DagTask - Hold the structure of the Dag
@@ -51,9 +64,95 @@ type DagTask struct {
 	StartDate     time.Time
 	MesosExecutor struct {
 		Cpus         float64 `json:"cpus"`
-		MemLimit     int     `json:"mem_limit" default:"2048"`
+		MemLimit     string  `json:"mem_limit" default:"10g"`
 		InstanceType string  `json:"instance_type"`
+		Architecture string  `json:"architecture" default:"x86_64"`
 	} `json:"MesosExecutor"`
+}
+
+// MesosAgents
+type MesosAgent struct {
+	Slaves          []AgentInfo   `json:"slaves"`
+	RecoveredSlaves []interface{} `json:"recovered_slaves"`
+}
+
+// AgentInfo - Hold the structure of the agents info in master
+type AgentInfo struct {
+	ID         string `json:"id"`
+	Hostname   string `json:"hostname"`
+	Port       int    `json:"port"`
+	Attributes struct {
+	} `json:"attributes"`
+	Pid              string  `json:"pid"`
+	RegisteredTime   float64 `json:"registered_time"`
+	ReregisteredTime float64 `json:"reregistered_time"`
+	Resources        struct {
+		Disk  float64 `json:"disk"`
+		Mem   float64 `json:"mem"`
+		Gpus  float64 `json:"gpus"`
+		Cpus  float64 `json:"cpus"`
+		Ports string  `json:"ports"`
+	} `json:"resources"`
+	UsedResources struct {
+		Disk  float64 `json:"disk"`
+		Mem   float64 `json:"mem"`
+		Gpus  float64 `json:"gpus"`
+		Cpus  float64 `json:"cpus"`
+		Ports string  `json:"ports"`
+	} `json:"used_resources"`
+	OfferedResources struct {
+		Disk float64 `json:"disk"`
+		Mem  float64 `json:"mem"`
+		Gpus float64 `json:"gpus"`
+		Cpus float64 `json:"cpus"`
+	} `json:"offered_resources"`
+	ReservedResources struct {
+	} `json:"reserved_resources"`
+	UnreservedResources struct {
+		Disk  float64 `json:"disk"`
+		Mem   float64 `json:"mem"`
+		Gpus  float64 `json:"gpus"`
+		Cpus  float64 `json:"cpus"`
+		Ports string  `json:"ports"`
+	} `json:"unreserved_resources"`
+	Active                bool     `json:"active"`
+	Deactivated           bool     `json:"deactivated"`
+	Version               string   `json:"version"`
+	Capabilities          []string `json:"capabilities"`
+	ReservedResourcesFull struct {
+	} `json:"reserved_resources_full"`
+	UnreservedResourcesFull []struct {
+		Name   string `json:"name"`
+		Type   string `json:"type"`
+		Scalar struct {
+			Value float64 `json:"value"`
+		} `json:"scalar,omitempty"`
+		Role   string `json:"role"`
+		Ranges struct {
+			Range []struct {
+				Begin int `json:"begin"`
+				End   int `json:"end"`
+			} `json:"range"`
+		} `json:"ranges,omitempty"`
+	} `json:"unreserved_resources_full"`
+	UsedResourcesFull []struct {
+		Name   string `json:"name"`
+		Type   string `json:"type"`
+		Scalar struct {
+			Value float64 `json:"value"`
+		} `json:"scalar,omitempty"`
+		Role           string `json:"role"`
+		AllocationInfo struct {
+			Role string `json:"role"`
+		} `json:"allocation_info"`
+		Ranges struct {
+			Range []struct {
+				Begin int `json:"begin"`
+				End   int `json:"end"`
+			} `json:"range"`
+		} `json:"ranges,omitempty"`
+	} `json:"used_resources_full"`
+	OfferedResourcesFull []interface{} `json:"offered_resources_full"`
 }
 
 // MesosAgentState - Hold the Agents JSON from mesos
@@ -395,3 +494,81 @@ type EC2Struct struct {
 	AgentTimeout int  `default:"0"`
 	Check        bool `efault:"false"`
 }
+
+// MesosAgentDeactivate - is the message call to deactivate an agent
+type MesosAgentDeactivate struct {
+	Type            string `json:"type"`
+	DeactivateAgent struct {
+		AgentID struct {
+			Value string `json:"value"`
+		} `json:"agent_id"`
+	} `json:"deactivate_agent"`
+}
+
+// EC2InstancePrice - give us the price information on an ec2 instance
+//type EC2InstancePrice struct {
+//	Product struct {
+//		Attributes struct {
+//			AvailabilityZone            string  `json:"availabilityzone"`
+//			CapacityStatus              string  `json:"capacitystatus"`
+//			ClassicNetworkingSupport    bool    `json:"classicnetworkingsupport"`
+//			ClockSpeed                  string  `json:"clockSpeed"`
+//			CurrentGeneration           string  `json:"currentGeneration"`
+//			DedicatedEBSThroughput      string  `json:"dedicatedEbsThroughput"`
+//			ECU                         string  `json:"ecu"`
+//			EnhancedNetworkingSupported bool    `json:"enhancedNetworkingSupported"`
+//			GPUMemory                   string  `json:"gpuMemory"`
+//			InstanceFamily              string  `json:"instanceFamily"`
+//			InstanceType                string  `json:"instanceType"`
+//			IntelAVX2Available          bool    `json:"intelAvx2Available"`
+//			IntelAVXAvailable           bool    `json:"intelAvxAvailable"`
+//			IntelTurboAvailable         bool    `json:"intelTurboAvailable"`
+//			LicenseModel                string  `json:"licenseModel"`
+//			Location                    string  `json:"location"`
+//			LocationType                string  `json:"locationType"`
+//			MarketOption                string  `json:"marketoption"`
+//			Memory                      string  `json:"memory"`
+//			NetworkPerformance          string  `json:"networkPerformance"`
+//			NormalizationSizeFactor     float64 `json:"normalizationSizeFactor"`
+//			OperatingSystem             string  `json:"operatingSystem"`
+//			Operation                   string  `json:"operation"`
+//			PhysicalProcessor           string  `json:"physicalProcessor"`
+//			PreInstalledSw              string  `json:"preInstalledSw"`
+//			ProcessorArchitecture       string  `json:"processorArchitecture"`
+//			RegionCode                  string  `json:"regionCode"`
+//			ServiceCode                 string  `json:"servicecode"`
+//			ServiceName                 string  `json:"servicename"`
+//			Storage                     string  `json:"storage"`
+//			Tenancy                     string  `json:"tenancy"`
+//			UsageType                   string  `json:"usagetype"`
+//			Vcpu                        string  `json:"vcpu"`
+//			VpcNetworkingSupport        bool    `json:"vpcnetworkingsupport"`
+//		} `json:"attributes"`
+//		ProductFamily string `json:"productFamily"`
+//		SKU           string `json:"sku"`
+//	} `json:"product"`
+//	PublicationDate string `json:"publicationDate"`
+//	ServiceCode     string `json:"serviceCode"`
+//	Terms           struct {
+//		OnDemand struct {
+//			TermData struct {
+//				EffectiveDate   string `json:"effectiveDate"`
+//				OfferTermCode   string `json:"offerTermCode"`
+//				PriceDimensions map[string]struct {
+//					AppliesTo    []string `json:"appliesTo"`
+//					BeginRange   string   `json:"beginRange"`
+//					Description  string   `json:"description"`
+//					EndRange     string   `json:"endRange"`
+//					PricePerUnit struct {
+//						USD float64 `json:"USD"`
+//					} `json:"pricePerUnit"`
+//					RateCode string `json:"rateCode"`
+//					Unit     string `json:"unit"`
+//				} `json:"priceDimensions"`
+//				SKU            string                 `json:"sku"`
+//				TermAttributes map[string]interface{} `json:"termAttributes"`
+//			} `json:"22VNQ3N6GZGZMXYM.JRTCKXETXF"`
+//		} `json:"OnDemand"`
+//	} `json:"terms"`
+//	Version string `json:"version"`
+//}

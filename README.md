@@ -1,6 +1,15 @@
 # AWS Autoscaler for Apache Airflow Mesos Provider
 
+[![Issues](https://img.shields.io/static/v1?label=&message=Issues&color=brightgreen)](https://github.com/m3scluster/mesos-airflow-autoscaler-aws/issues)
+[![Chat](https://img.shields.io/static/v1?label=&message=Chat&color=brightgreen)](https://matrix.to/#/#mesos:matrix.aventer.biz?via=matrix.aventer.biz)
+[![GoDoc](https://godoc.org/github.com/AVENTER-UG/mesos-dns?status.svg)](https://godoc.org/github.com/AVENTER-UG/mesos-airflow-autoscaler-aws)
+[![Docker Pulls](https://img.shields.io/docker/pulls/avhost/mesos-airflow-autoscaler-aws)](https://hub.docker.com/repository/docker/avhost/mesos-airflow-autoscaler-aws/)
+
 This AWS autoscaler will start EC2 instances if Airflow does not get matched offers from mesos.
+
+## Issues
+
+To open an issue, please use this place: https://github.com/m3scluster/mesos-airflow-autoscaler-aws/issues
 
 ## Requirements
 
@@ -17,6 +26,7 @@ This AWS autoscaler will start EC2 instances if Airflow does not get matched off
 | AIRFLOW_MESOS_SCHEDULER | 127.0.0.1:11000 | IP Address and port of the Apache Airflow Mesos provider |
 | LOGLEVEL | debug | Loglevel (info, warn, debug) |
 | WAIT_TIME | 2m | The time in minutes the autoscaler have to wait until it will create a mesos instance in AWS |
+| WAIT_TIME_OVERWRITE_INSTANCE | 15m | If the DAG is still after 15m in the queue, the autoscaler will ignore the custom instance type to start a new ec2 instance. |
 | REDIS_SERVER | 127.0.0.1:6480 | Redis server and port |
 | REDIS_PASSWORD | | Redis DB password |
 | REDIS_DB | 2 | Redis DB Number |
@@ -27,9 +37,9 @@ This AWS autoscaler will start EC2 instances if Airflow does not get matched off
 | AWS_REGION | eu-central-1 | AWS Region |
 | AWS_WAIT_TIME | 10m | The time the autoscaler have to wait until it check if the EC2 intance can be terminated. |
 | AWS_LAUNCH_TEMPLATE_ID | | The AWS Launche Template ID | 
-| AWS_INSTANCE_16GB | t2.xlarge | The scale out instance type for memory limit lt 16GB (also the default instance if no memory limit was set) |
-| AWS_INSTANCE_32GB | t3.2xlarge | The scale out instance type for memory limit gt 32GB |
-| AWS_INSTANCE_64GB | r5.2xlarge | The scale out instance type for memory limit gt 64GB |
+| AWS_INSTANCE_FALLBACK | t3a.2xlarge | Fallback instance type will be used if there are no more ec2 resources in AWS. |
+| AWS_INSTANCE_DEFAULT_ARCHITECTURE | x86_64 | Default architecture of ec2 instance. | 
+| AWS_INSTANCE_ALLOW | "t3.,r5.,c5." | Only these instances are allowed. |
 | MESOS_AGENT_SSL | false | Enable SSL for the communication to the Mesos agent |
 | MESOS_AGENT_USERNAME | | Username of the Mesos Agent |
 | MESOS_AGENT_PASSWORD | | Password of the Mesos Agent |
