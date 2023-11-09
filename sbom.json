@@ -1,14 +1,17 @@
 {
  "artifacts": [
   {
-   "id": "b8c6784754ba4491",
+   "id": "555fb8af9e4f507c",
    "name": "github.com/AVENTER-UG/go-logrus-formatter",
    "version": "v0.5.4",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -28,14 +31,95 @@
    }
   },
   {
-   "id": "6fc59cf733121cfc",
+   "id": "41078528842cecde",
+   "name": "github.com/AVENTER-UG/go-logrus-formatter",
+   "version": "v0.5.4",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:AVENTER-UG:go-logrus-formatter:v0.5.4:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER-UG:go_logrus_formatter:v0.5.4:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER_UG:go-logrus-formatter:v0.5.4:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER_UG:go_logrus_formatter:v0.5.4:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER:go-logrus-formatter:v0.5.4:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER:go_logrus_formatter:v0.5.4:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/AVENTER-UG/go-logrus-formatter@v0.5.4",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:pT//3WIdLWQYfUGuNdbz3cXQovUh6DDHoUCESxoG5uM=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "f1228ed4ce966b47",
+   "name": "github.com/AVENTER-UG/mesos-autoscale",
+   "version": "v2023-08-03T13",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:AVENTER-UG:mesos-autoscale:v2023-08-03T13:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER-UG:mesos_autoscale:v2023-08-03T13:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER_UG:mesos-autoscale:v2023-08-03T13:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER_UG:mesos_autoscale:v2023-08-03T13:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER:mesos-autoscale:v2023-08-03T13:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER:mesos_autoscale:v2023-08-03T13:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/AVENTER-UG/mesos-autoscale@v2023-08-03T13",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goBuildSettings": {
+     "-buildmode": "exe",
+     "-compiler": "gc",
+     "-ldflags": "-X main.BuildVersion=2023-08-03T13:18:54Z -X main.GitVersion=latest -extldflags \"-static\"",
+     "CGO_ENABLED": "0",
+     "GOAMD64": "v1",
+     "GOARCH": "amd64",
+     "GOOS": "linux",
+     "vcs": "git",
+     "vcs.modified": "true",
+     "vcs.revision": "cf1e5adcb7cd9b8e93de9b1e6c65fe65c9036d1f",
+     "vcs.time": "2023-05-02T14:44:18Z"
+    },
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "cd2a9ff11fd3cf57",
    "name": "github.com/AVENTER-UG/util",
    "version": "v0.3.0",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -52,37 +136,102 @@
    }
   },
   {
-   "id": "f17ad48fc14872d9",
-   "name": "github.com/aws/aws-sdk-go",
-   "version": "v1.44.204",
+   "id": "ecea3b9232f96029",
+   "name": "github.com/AVENTER-UG/util",
+   "version": "v0.3.0",
    "type": "go-module",
-   "foundBy": "go-mod-file-cataloger",
+   "foundBy": "go-module-binary-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
    "language": "go",
    "cpes": [
-    "cpe:2.3:a:aws:aws-sdk-go:v1.44.204:*:*:*:*:*:*:*",
-    "cpe:2.3:a:aws:aws_sdk_go:v1.44.204:*:*:*:*:*:*:*"
+    "cpe:2.3:a:AVENTER-UG:util:v0.3.0:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER_UG:util:v0.3.0:*:*:*:*:*:*:*",
+    "cpe:2.3:a:AVENTER:util:v0.3.0:*:*:*:*:*:*:*"
    ],
-   "purl": "pkg:golang/github.com/aws/aws-sdk-go@v1.44.204",
-   "metadataType": "GolangModMetadata",
+   "purl": "pkg:golang/github.com/AVENTER-UG/util@v0.3.0",
+   "metadataType": "GolangBinMetadata",
    "metadata": {
-    "h1Digest": "h1:7/tPUXfNOHB390A63t6fJIwmlwVQAkAwcbzKsU2/6OQ="
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:wtUC7e6LMx37BRGBKKBZ4BUM8q4lkLjgBinS09luv6A=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
    }
   },
   {
-   "id": "1228868a78c4aa49",
+   "id": "6c887b2bf8279631",
+   "name": "github.com/aws/aws-sdk-go",
+   "version": "v1.44.254",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go:v1.44.254:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go:v1.44.254:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go@v1.44.254",
+   "metadataType": "GolangModMetadata",
+   "metadata": {
+    "h1Digest": "h1:8baW4yal2xGiM/Wm5/ZU10drS8sd+BVjMjPFjJx2ooc="
+   }
+  },
+  {
+   "id": "6e3a5b65748ccd02",
+   "name": "github.com/aws/aws-sdk-go",
+   "version": "v1.44.254",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:aws:aws-sdk-go:v1.44.254:*:*:*:*:*:*:*",
+    "cpe:2.3:a:aws:aws_sdk_go:v1.44.254:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/aws/aws-sdk-go@v1.44.254",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:8baW4yal2xGiM/Wm5/ZU10drS8sd+BVjMjPFjJx2ooc=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "4a98c630c9c21772",
    "name": "github.com/cespare/xxhash/v2",
    "version": "v2.2.0",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -97,14 +246,45 @@
    }
   },
   {
-   "id": "b6078d1fca94622c",
+   "id": "3e822080c9ea9000",
+   "name": "github.com/cespare/xxhash/v2",
+   "version": "v2.2.0",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:cespare:xxhash\\/v2:v2.2.0:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/cespare/xxhash/v2@v2.2.0",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "8bfb7c3c4f2d5c78",
    "name": "github.com/dgryski/go-rendezvous",
    "version": "v0.0.0-20200823014737-9f7001d12a5f",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -120,14 +300,46 @@
    }
   },
   {
-   "id": "88043efa3dffc91c",
+   "id": "6d5aae3c9abfbecf",
+   "name": "github.com/dgryski/go-rendezvous",
+   "version": "v0.0.0-20200823014737-9f7001d12a5f",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:dgryski:go-rendezvous:v0.0.0-20200823014737-9f7001d12a5f:*:*:*:*:*:*:*",
+    "cpe:2.3:a:dgryski:go_rendezvous:v0.0.0-20200823014737-9f7001d12a5f:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/dgryski/go-rendezvous@v0.0.0-20200823014737-9f7001d12a5f",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "857792dc29de612c",
    "name": "github.com/go-redis/redis/v8",
    "version": "v8.11.5",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -144,14 +356,47 @@
    }
   },
   {
-   "id": "706e2bb33dce165c",
+   "id": "0409b90bc715c608",
+   "name": "github.com/go-redis/redis/v8",
+   "version": "v8.11.5",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:go-redis:redis\\/v8:v8.11.5:*:*:*:*:*:*:*",
+    "cpe:2.3:a:go_redis:redis\\/v8:v8.11.5:*:*:*:*:*:*:*",
+    "cpe:2.3:a:go:redis\\/v8:v8.11.5:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/go-redis/redis/v8@v8.11.5",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:AcZZR7igkdvfVmQTPnu9WE37LRrO/YrBH5zWyjDC0oI=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "35c92f3ee91bba87",
    "name": "github.com/jmespath/go-jmespath",
    "version": "v0.4.0",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -167,14 +412,46 @@
    }
   },
   {
-   "id": "ceddf32254e255a9",
+   "id": "105d099b5999d530",
+   "name": "github.com/jmespath/go-jmespath",
+   "version": "v0.4.0",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:jmespath:go-jmespath:v0.4.0:*:*:*:*:*:*:*",
+    "cpe:2.3:a:jmespath:go_jmespath:v0.4.0:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/jmespath/go-jmespath@v0.4.0",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "ceb52d86c55dd680",
    "name": "github.com/mattn/go-colorable",
    "version": "v0.1.13",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -190,37 +467,101 @@
    }
   },
   {
-   "id": "4be395b49de5ae74",
-   "name": "github.com/mattn/go-isatty",
-   "version": "v0.0.17",
+   "id": "8ecddb4a95c28fc8",
+   "name": "github.com/mattn/go-colorable",
+   "version": "v0.1.13",
    "type": "go-module",
-   "foundBy": "go-mod-file-cataloger",
+   "foundBy": "go-module-binary-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
    "language": "go",
    "cpes": [
-    "cpe:2.3:a:mattn:go-isatty:v0.0.17:*:*:*:*:*:*:*",
-    "cpe:2.3:a:mattn:go_isatty:v0.0.17:*:*:*:*:*:*:*"
+    "cpe:2.3:a:mattn:go-colorable:v0.1.13:*:*:*:*:*:*:*",
+    "cpe:2.3:a:mattn:go_colorable:v0.1.13:*:*:*:*:*:*:*"
    ],
-   "purl": "pkg:golang/github.com/mattn/go-isatty@v0.0.17",
-   "metadataType": "GolangModMetadata",
+   "purl": "pkg:golang/github.com/mattn/go-colorable@v0.1.13",
+   "metadataType": "GolangBinMetadata",
    "metadata": {
-    "h1Digest": "h1:BTarxUcIeDqL27Mc+vyvdWYSL28zpIhv3RoTdsLMPng="
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
    }
   },
   {
-   "id": "cd0469f33951c630",
+   "id": "d4933e9bc217907f",
+   "name": "github.com/mattn/go-isatty",
+   "version": "v0.0.18",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:mattn:go-isatty:v0.0.18:*:*:*:*:*:*:*",
+    "cpe:2.3:a:mattn:go_isatty:v0.0.18:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/mattn/go-isatty@v0.0.18",
+   "metadataType": "GolangModMetadata",
+   "metadata": {
+    "h1Digest": "h1:DOKFKCQ7FNG2L1rbrmstDN4QVRdS89Nkh85u68Uwp98="
+   }
+  },
+  {
+   "id": "987b2bcb14354dfd",
+   "name": "github.com/mattn/go-isatty",
+   "version": "v0.0.18",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:mattn:go-isatty:v0.0.18:*:*:*:*:*:*:*",
+    "cpe:2.3:a:mattn:go_isatty:v0.0.18:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/mattn/go-isatty@v0.0.18",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:DOKFKCQ7FNG2L1rbrmstDN4QVRdS89Nkh85u68Uwp98=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "d67a4c26cb38f7ce",
    "name": "github.com/mgutz/ansi",
    "version": "v0.0.0-20200706080929-d51e80ef957d",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -235,14 +576,45 @@
    }
   },
   {
-   "id": "aba2609b232a80db",
+   "id": "564792b6747d92e0",
+   "name": "github.com/mgutz/ansi",
+   "version": "v0.0.0-20200706080929-d51e80ef957d",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:mgutz:ansi:v0.0.0-20200706080929-d51e80ef957d:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/mgutz/ansi@v0.0.0-20200706080929-d51e80ef957d",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:5PJl274Y63IEHC+7izoQE9x6ikvDFZS2mDVS3drnohI=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "e1788a8d93e984bf",
    "name": "github.com/russross/blackfriday",
    "version": "v1.6.0",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -257,14 +629,45 @@
    }
   },
   {
-   "id": "965404179e0b694",
+   "id": "3bc675091b85183d",
+   "name": "github.com/russross/blackfriday",
+   "version": "v1.6.0",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:russross:blackfriday:v1.6.0:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/russross/blackfriday@v1.6.0",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:KqfZb0pUVN2lYqZUYRddxF4OR8ZMURnJIG5Y3VRLtww=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "c8dabe744c4eab66",
    "name": "github.com/sirupsen/logrus",
    "version": "v1.9.0",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
@@ -279,153 +682,527 @@
    }
   },
   {
-   "id": "6c0fe90d20dd5d99",
+   "id": "d4b1f5b027809c71",
+   "name": "github.com/sirupsen/logrus",
+   "version": "v1.9.0",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:sirupsen:logrus:v1.9.0:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/github.com/sirupsen/logrus@v1.9.0",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:trlNQbNUG3OdDrDil03MCb1H2o9nJ1x4/5LYw7byDE0=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "596b1fbf27ac10a4",
    "name": "golang.org/x/crypto",
-   "version": "v0.6.0",
+   "version": "v0.8.0",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
    "language": "go",
    "cpes": [
-    "cpe:2.3:a:golang:x\\/crypto:v0.6.0:*:*:*:*:*:*:*"
+    "cpe:2.3:a:golang:x\\/crypto:v0.8.0:*:*:*:*:*:*:*"
    ],
-   "purl": "pkg:golang/golang.org/x/crypto@v0.6.0",
+   "purl": "pkg:golang/golang.org/x/crypto@v0.8.0",
    "metadataType": "GolangModMetadata",
    "metadata": {
-    "h1Digest": "h1:qfktjS5LUO+fFKeJXZ+ikTRijMmljikvG68fpMMruSc="
+    "h1Digest": "h1:pd9TJtTueMTVQXzk8E2XESSMQDj/U7OUu0PqJqPXQjQ="
    }
   },
   {
-   "id": "b3ee3a94fe8b0428",
+   "id": "7a4fe0e49eb37527",
+   "name": "golang.org/x/crypto",
+   "version": "v0.8.0",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:golang:x\\/crypto:v0.8.0:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/golang.org/x/crypto@v0.8.0",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:pd9TJtTueMTVQXzk8E2XESSMQDj/U7OUu0PqJqPXQjQ=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "0f1a80ba4cdf2569",
    "name": "golang.org/x/sys",
-   "version": "v0.5.0",
+   "version": "v0.7.0",
    "type": "go-module",
    "foundBy": "go-mod-file-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
    "language": "go",
    "cpes": [
-    "cpe:2.3:a:golang:x\\/sys:v0.5.0:*:*:*:*:*:*:*"
+    "cpe:2.3:a:golang:x\\/sys:v0.7.0:*:*:*:*:*:*:*"
    ],
-   "purl": "pkg:golang/golang.org/x/sys@v0.5.0",
+   "purl": "pkg:golang/golang.org/x/sys@v0.7.0",
    "metadataType": "GolangModMetadata",
    "metadata": {
-    "h1Digest": "h1:MUK/U/4lj1t1oPg0HfuXDN/Z1wv31ZJ/YcPiGccS4DU="
+    "h1Digest": "h1:3jlCCIQZPdOYu1h8BkNvLz8Kgwtae2cagcG/VamtZRU="
    }
   },
   {
-   "id": "5bac34eaa298bc55",
-   "name": "golang.org/x/term",
-   "version": "v0.5.0",
+   "id": "0cfe765f6b4d5fcb",
+   "name": "golang.org/x/sys",
+   "version": "v0.7.0",
    "type": "go-module",
-   "foundBy": "go-mod-file-cataloger",
+   "foundBy": "go-module-binary-cataloger",
    "locations": [
     {
-     "path": "go.mod"
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
     }
    ],
    "licenses": [],
    "language": "go",
    "cpes": [
-    "cpe:2.3:a:golang:x\\/term:v0.5.0:*:*:*:*:*:*:*"
+    "cpe:2.3:a:golang:x\\/sys:v0.7.0:*:*:*:*:*:*:*"
    ],
-   "purl": "pkg:golang/golang.org/x/term@v0.5.0",
+   "purl": "pkg:golang/golang.org/x/sys@v0.7.0",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:3jlCCIQZPdOYu1h8BkNvLz8Kgwtae2cagcG/VamtZRU=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
+   }
+  },
+  {
+   "id": "5402e5227d6e5bad",
+   "name": "golang.org/x/term",
+   "version": "v0.7.0",
+   "type": "go-module",
+   "foundBy": "go-mod-file-cataloger",
+   "locations": [
+    {
+     "path": "/go.mod",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:golang:x\\/term:v0.7.0:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/golang.org/x/term@v0.7.0",
    "metadataType": "GolangModMetadata",
    "metadata": {
-    "h1Digest": "h1:n2a8QNdAb0sZNpU9R1ALUXBbY+w51fCQDN+7EdxNBsY="
+    "h1Digest": "h1:BEvjmm5fURWqcfbSKTdpkDXYBrUS1c0m8agp14W48vQ="
+   }
+  },
+  {
+   "id": "ae7a6acf5fd854eb",
+   "name": "golang.org/x/term",
+   "version": "v0.7.0",
+   "type": "go-module",
+   "foundBy": "go-module-binary-cataloger",
+   "locations": [
+    {
+     "path": "/mesos-autoscale",
+     "annotations": {
+      "evidence": "primary"
+     }
+    }
+   ],
+   "licenses": [],
+   "language": "go",
+   "cpes": [
+    "cpe:2.3:a:golang:x\\/term:v0.7.0:*:*:*:*:*:*:*"
+   ],
+   "purl": "pkg:golang/golang.org/x/term@v0.7.0",
+   "metadataType": "GolangBinMetadata",
+   "metadata": {
+    "goCompiledVersion": "go1.20.6",
+    "architecture": "amd64",
+    "h1Digest": "h1:BEvjmm5fURWqcfbSKTdpkDXYBrUS1c0m8agp14W48vQ=",
+    "mainModule": "github.com/AVENTER-UG/mesos-autoscale"
    }
   }
  ],
  "artifactRelationships": [
   {
+   "parent": "0409b90bc715c608",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "0cfe765f6b4d5fcb",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "0f1a80ba4cdf2569",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "105d099b5999d530",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "35c92f3ee91bba87",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "3bc675091b85183d",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "3e822080c9ea9000",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "41078528842cecde",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "4a98c630c9c21772",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "5402e5227d6e5bad",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "555fb8af9e4f507c",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "564792b6747d92e0",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "596b1fbf27ac10a4",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "6c887b2bf8279631",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "6d5aae3c9abfbecf",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "6e3a5b65748ccd02",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "7a4fe0e49eb37527",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "857792dc29de612c",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "8bfb7c3c4f2d5c78",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "8ecddb4a95c28fc8",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "987b2bcb14354dfd",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "ae7a6acf5fd854eb",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "c8dabe744c4eab66",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "cd2a9ff11fd3cf57",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "1228868a78c4aa49",
+   "child": "0409b90bc715c608",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "4be395b49de5ae74",
+   "child": "0cfe765f6b4d5fcb",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "5bac34eaa298bc55",
+   "child": "0f1a80ba4cdf2569",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "6c0fe90d20dd5d99",
+   "child": "105d099b5999d530",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "6fc59cf733121cfc",
+   "child": "35c92f3ee91bba87",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "706e2bb33dce165c",
+   "child": "3bc675091b85183d",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "88043efa3dffc91c",
+   "child": "3e822080c9ea9000",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "965404179e0b694",
+   "child": "41078528842cecde",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "aba2609b232a80db",
+   "child": "4a98c630c9c21772",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "b3ee3a94fe8b0428",
+   "child": "5402e5227d6e5bad",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "b6078d1fca94622c",
+   "child": "555fb8af9e4f507c",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "b8c6784754ba4491",
+   "child": "564792b6747d92e0",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "cd0469f33951c630",
+   "child": "596b1fbf27ac10a4",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "ceddf32254e255a9",
+   "child": "6c887b2bf8279631",
    "type": "contains"
   },
   {
    "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
-   "child": "f17ad48fc14872d9",
+   "child": "6d5aae3c9abfbecf",
    "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "6e3a5b65748ccd02",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "7a4fe0e49eb37527",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "857792dc29de612c",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "8bfb7c3c4f2d5c78",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "8ecddb4a95c28fc8",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "987b2bcb14354dfd",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "ae7a6acf5fd854eb",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "c8dabe744c4eab66",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "cd2a9ff11fd3cf57",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "ceb52d86c55dd680",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "d4933e9bc217907f",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "d4b1f5b027809c71",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "d67a4c26cb38f7ce",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "e1788a8d93e984bf",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "ecea3b9232f96029",
+   "type": "contains"
+  },
+  {
+   "parent": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+   "child": "f1228ed4ce966b47",
+   "type": "contains"
+  },
+  {
+   "parent": "ceb52d86c55dd680",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "d4933e9bc217907f",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "d4b1f5b027809c71",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "d67a4c26cb38f7ce",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "e1788a8d93e984bf",
+   "child": "3fc5a8d3d86e9790",
+   "type": "evident-by"
+  },
+  {
+   "parent": "ecea3b9232f96029",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  },
+  {
+   "parent": "f1228ed4ce966b47",
+   "child": "70878487767d69c9",
+   "type": "evident-by"
+  }
+ ],
+ "files": [
+  {
+   "id": "3fc5a8d3d86e9790",
+   "location": {
+    "path": "/go.mod"
+   }
+  },
+  {
+   "id": "70878487767d69c9",
+   "location": {
+    "path": "/mesos-autoscale"
+   }
   }
  ],
  "source": {
   "id": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+  "name": ".",
+  "version": "",
   "type": "directory",
-  "target": "."
+  "metadata": {
+   "path": "."
+  }
  },
  "distro": {},
  "descriptor": {
@@ -458,6 +1235,16 @@
     },
     "search-unindexed-archives": false,
     "search-indexed-archives": true
+   },
+   "golang": {
+    "search-local-mod-cache-licenses": false,
+    "local-mod-cache-dir": "",
+    "search-remote-licenses": false,
+    "proxy": "",
+    "no-proxy": ""
+   },
+   "linux-kernel": {
+    "catalog-modules": true
    },
    "attest": {},
    "file-metadata": {
@@ -501,11 +1288,22 @@
    "exclude": [],
    "platform": "",
    "name": "",
-   "parallelism": 1
+   "source": {
+    "name": "",
+    "version": "",
+    "file": {
+     "digests": [
+      "sha256"
+     ]
+    }
+   },
+   "parallelism": 1,
+   "default-image-pull-source": "",
+   "base-path": ""
   }
  },
  "schema": {
-  "version": "7.0.1",
-  "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-7.0.1.json"
+  "version": "9.0.0",
+  "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-9.0.0.json"
  }
 }

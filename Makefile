@@ -34,7 +34,7 @@ else
 endif
 
 build:
-	@echo ">>>> Build Docker branch:" ${BRANCH}
+	@echo ">>>> Build Docker branch: latest" 
 	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
 
 build-bin:
@@ -42,11 +42,9 @@ build-bin:
 	@CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags "-X main.BuildVersion=${BUILDDATE} -X main.GitVersion=${TAG} -extldflags \"-static\"" .
 
 push:
-	@echo ">>>> Publish docker image"
-	@docker buildx create --use --name buildkit
-	@docker buildx build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
-	@docker buildx build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
-	@docker buildx rm buildkit
+	@echo ">>>> Publish docker image: " ${BRANCH}
+	@docker  build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@docker  build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
 
 update-gomod:
 	go get -u
@@ -73,4 +71,4 @@ version:
 	@echo "Saved under .version.json"
 
 check: go-fmt sboom seccheck
-all: check build version sboom push
+all: check build version sboom 

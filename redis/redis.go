@@ -103,7 +103,14 @@ func (e *Redis) CountRedisKey(pattern string) int {
 // SaveDagTaskRedis store mesos task in DB
 func (e *Redis) SaveDagTaskRedis(task cfg.DagTask) {
 	d, _ := json.Marshal(&task)
+	logrus.WithField("func", "redis.SaveDagTaskRedis").Trace("Save DAG: " + task.DagID + ":" + task.TaskID + ":" + task.RunID + ":" + strconv.Itoa(task.TryNumber))
 	e.SetRedisKey(d, task.DagID+":"+task.TaskID+":"+task.RunID+":"+strconv.Itoa(task.TryNumber), e.Config.RedisTTL)
+}
+
+// DelDagTaskRedis delete dag task
+func (e *Redis) DelDagTaskRedis(task cfg.DagTask) int64 {
+	logrus.WithField("func", "redis.DelDagTaskRedis").Trace("Delete DAG: " + task.DagID + ":" + task.TaskID + ":" + task.RunID + ":" + strconv.Itoa(task.TryNumber))
+	return e.DelRedisKey(e.Config.RedisPrefix + ":dags:" + task.DagID + ":" + task.TaskID + ":" + task.RunID + ":" + strconv.Itoa(task.TryNumber))
 }
 
 // SaveEC2InstanceRedis store mesos task in DB
@@ -129,8 +136,7 @@ func (e *Redis) SetRedisKey(data []byte, key string, exp time.Duration) {
 
 // PingRedis to check the health of redis
 func (e *Redis) PingRedis() error {
-	pong, err := e.RedisClient.Ping(e.RedisCTX).Result()
-	logrus.Debug("Redis Health: ", pong, err)
+	_, err := e.RedisClient.Ping(e.RedisCTX).Result()
 	if err != nil {
 		return err
 	}

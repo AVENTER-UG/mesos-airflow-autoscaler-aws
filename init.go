@@ -1,12 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	util "github.com/AVENTER-UG/util"
+	"github.com/sirupsen/logrus"
 
 	cfg "github.com/AVENTER-UG/mesos-autoscale/types"
 )
@@ -19,18 +21,20 @@ func init() {
 	config.AWSWait = util.Getenv("AWS_WAIT_TIME", "10m")
 	config.AWSLaunchTemplateID = os.Getenv("AWS_LAUNCH_TEMPLATE_ID")
 	config.AWSRegion = util.Getenv("AWS_REGION", "eu-central-1")
-	config.AWSInstance16 = util.Getenv("AWS_INSTANCE_16GB", "t2.xlarge")
-	config.AWSInstance32 = util.Getenv("AWS_INSTANCE_32GB", "t3.2xlarge")
-	config.AWSInstance64 = util.Getenv("AWS_INSTANCE_64GB", "r5.2xlarge")
+	config.AWSInstanceDefaultArchitecture = util.Getenv("AWS_INSTANCE_DEFAULT_ARCHITECTURE", "x86_64")
 	config.AWSInstanceFallback = util.Getenv("AWS_INSTANCE_FALLBACK", "t3a.2xlarge")
 	config.AirflowMesosScheduler = util.Getenv("AIRFLOW_MESOS_SCHEDULER", "127.0.0.1:11000")
 	config.AirflowMesosName = util.Getenv("AIRFLOW_MESOS_NAME", "Airflow")
 	config.APIUsername = util.Getenv("API_USERNAME", "user")
 	config.APIPassword = util.Getenv("API_PASSWORD", "password")
 	config.LogLevel = util.Getenv("LOGLEVEL", "debug")
-	config.MesosAgentUsername = os.Getenv("MESOS_AGENT_USERNAME")
-	config.MesosAgentPassword = os.Getenv("MESOS_AGENT_PASSWORD")
+	config.MesosAgentUsername = util.Getenv("MESOS_AGENT_USERNAME", "mesos")
+	config.MesosAgentPassword = util.Getenv("MESOS_AGENT_PASSWORD", "")
 	config.MesosAgentPort = util.Getenv("MESOS_AGENT_PORT", "5051")
+	config.MesosMasterUsername = util.Getenv("MESOS_MASTER_USERNAME", "mesos")
+	config.MesosMasterPassword = util.Getenv("MESOS_MASTER_PASSWORD", "")
+	config.MesosMasterPort = util.Getenv("MESOS_MASTER_PORT", "5050")
+	config.MesosMaster = util.Getenv("MESOS_MASTER", "leader.mesos")
 	config.RedisServer = util.Getenv("REDIS_SERVER", "127.0.0.1:6480")
 	config.RedisPassword = os.Getenv("REDIS_PASSWORD")
 	config.RedisDB, _ = strconv.Atoi(util.Getenv("REDIS_DB", "2"))
@@ -42,6 +46,9 @@ func init() {
 
 	// set the time to wait that the dag is running until we scale up AWS
 	config.WaitTimeout, _ = time.ParseDuration(util.Getenv("WAIT_TIME", "2m"))
+
+	// set the time to wait until we overwrite the instance type from the executor.
+	config.WaitTimeoutOverwrite, _ = time.ParseDuration(util.Getenv("WAIT_TIME_OVERWRITE_INSTANCE", "15m"))
 
 	// set the time to wait until we will check if we can terminte the ec2 instance
 	config.AWSTerminateWait, _ = time.ParseDuration(config.AWSWait)
@@ -56,6 +63,12 @@ func init() {
 		config.SSL = true
 	} else {
 		config.SSL = false
+	}
+
+	if strings.Compare(util.Getenv("AWS_INSTANCE_TERMINATE", "true"), "false") == 0 {
+		config.AWSInstanceTerminate = false
+	} else {
+		config.AWSInstanceTerminate = true
 	}
 
 	// The comunication to the mesos server should be via ssl or not
@@ -77,5 +90,14 @@ func init() {
 		config.SkipSSL = true
 	} else {
 		config.SkipSSL = false
+	}
+
+	instanceTypes := os.Getenv("AWS_INSTANCE_ALLOW")
+	if instanceTypes != "" {
+		err := json.Unmarshal([]byte(instanceTypes), &config.AWSInstanceAllow)
+
+		if err != nil {
+			logrus.WithField("func", "init").Fatal("The env variable AWS_INSTANCE_ALLOW have a syntax failure: ", err)
+		}
 	}
 }
