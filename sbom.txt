@@ -1,6 +1,5 @@
 NAME                                       VERSION                             TYPE      
 github.com/AVENTER-UG/go-logrus-formatter  v0.5.4                              go-module  
-github.com/AVENTER-UG/mesos-autoscale      v2023-08-03T13                      go-module  
 github.com/AVENTER-UG/util                 v0.3.0                              go-module  
 github.com/aws/aws-sdk-go                  v1.44.254                           go-module  
 github.com/cespare/xxhash/v2               v2.2.0                              go-module  

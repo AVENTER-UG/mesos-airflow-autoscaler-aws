@@ -49,8 +49,8 @@ type Config struct {
 // InstanceTypes keep a sorted list of allowd instance types
 type InstanceTypes struct {
 	Name string
-	CPU  int64
-	MEM  int64
+	CPU  float64
+	MEM  float64
 	Arch string
 }
 

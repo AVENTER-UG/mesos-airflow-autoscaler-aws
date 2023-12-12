@@ -38,7 +38,7 @@ func (e *AWS) FindMatchedInstanceType(mem int64, cpu int64, arch string) string 
 	logrus.WithField("func", "aws.FindMarchedInstanceType").Debug()
 
 	for _, p := range e.Config.AWSInstanceAllow {
-		if p.MEM >= mem && p.CPU >= cpu {
+		if int64((p.MEM)*1024) >= mem && int64(p.CPU) >= cpu {
 
 			logrus.WithField("func", "aws.FindMatchedInstanceType").Trace("Found CPU: ", p.CPU)
 			logrus.WithField("func", "aws.FindMatchedInstanceType").Trace("Found MEM: ", p.MEM)

@@ -92,7 +92,7 @@ func init() {
 		config.SkipSSL = false
 	}
 
-	instanceTypes := os.Getenv("AWS_INSTANCE_ALLOW")
+	instanceTypes := strings.ReplaceAll(os.Getenv("AWS_INSTANCE_ALLOW"), "'", "\"")
 	if instanceTypes != "" {
 		err := json.Unmarshal([]byte(instanceTypes), &config.AWSInstanceAllow)
 
