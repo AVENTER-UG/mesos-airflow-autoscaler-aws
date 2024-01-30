@@ -290,10 +290,15 @@ func (e *Scheduler) checkEC2Instance() {
 				instance.Check = false
 				e.AWS.TerminateInstance(instance.EC2.Instances[0].InstanceId)
 				e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.EC2.Instances[0].InstanceId)
-				// create a new instance
-				var ec cfg.EC2Struct
-				ec.EC2 = e.AWS.CreateInstance(*instance.EC2.Instances[0].InstanceType)
-				e.Redis.SaveEC2InstanceRedis(ec)
+
+				// do not create a new instance, if this is already the `n try.
+				if instance.Try < e.Config.AWSMaxTry {
+					// create a new instance
+					var ec cfg.EC2Struct
+					ec.EC2 = e.AWS.CreateInstance(*instance.EC2.Instances[0].InstanceType)
+					ec.Try = instance.Try + 1
+					e.Redis.SaveEC2InstanceRedis(ec)
+				}
 				continue
 			}
 

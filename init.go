@@ -23,6 +23,7 @@ func init() {
 	config.AWSRegion = util.Getenv("AWS_REGION", "eu-central-1")
 	config.AWSInstanceDefaultArchitecture = util.Getenv("AWS_INSTANCE_DEFAULT_ARCHITECTURE", "x86_64")
 	config.AWSInstanceFallback = util.Getenv("AWS_INSTANCE_FALLBACK", "t3a.2xlarge")
+	config.AWSMaxTry, _ = strconv.Atoi(util.Getenv("AWS_INSTANCE_MAX_TRY", "3"))
 	config.AirflowMesosScheduler = util.Getenv("AIRFLOW_MESOS_SCHEDULER", "127.0.0.1:11000")
 	config.AirflowMesosName = util.Getenv("AIRFLOW_MESOS_NAME", "Airflow")
 	config.APIUsername = util.Getenv("API_USERNAME", "user")
@@ -36,7 +37,7 @@ func init() {
 	config.MesosMasterPort = util.Getenv("MESOS_MASTER_PORT", "5050")
 	config.MesosMaster = util.Getenv("MESOS_MASTER", "leader.mesos")
 	config.RedisServer = util.Getenv("REDIS_SERVER", "127.0.0.1:6480")
-	config.RedisPassword = os.Getenv("REDIS_PASSWORD")
+	config.RedisPassword = util.Getenv("REDIS_PASSWORD", "")
 	config.RedisDB, _ = strconv.Atoi(util.Getenv("REDIS_DB", "2"))
 	config.RedisPrefix = util.Getenv("REDIS_PREFIX", "asg")
 

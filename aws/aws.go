@@ -37,6 +37,10 @@ func New(config *cfg.Config) *AWS {
 func (e *AWS) FindMatchedInstanceType(mem int64, cpu int64, arch string) string {
 	logrus.WithField("func", "aws.FindMarchedInstanceType").Debug()
 
+	if len(e.Config.AWSInstanceAllow) == 0 {
+		logrus.WithField("func", "aws.FindMatchedInstanceType").Warn("No AWS_INSTANCE_ALLOW_LIST configured. Use fallback instance.")
+		return e.Config.AWSInstanceFallback
+	}
 	for _, p := range e.Config.AWSInstanceAllow {
 		if int64((p.MEM)*1024) >= mem && int64(p.CPU) >= cpu {
 

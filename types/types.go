@@ -35,6 +35,7 @@ type Config struct {
 	AWSInstanceAllow               []InstanceTypes
 	AWSInstanceTerminate           bool
 	AWSLaunchTemplateID            string
+	AWSMaxTry                      int
 	MesosAgentUsername             string
 	MesosAgentPassword             string
 	MesosAgentPort                 string
@@ -492,7 +493,8 @@ type MesosAgentState struct {
 type EC2Struct struct {
 	EC2          *ec2.Reservation
 	AgentTimeout int  `default:"0"`
-	Check        bool `efault:"false"`
+	Check        bool `default:"false"`
+	Try          int  `default: 0`
 }
 
 // MesosAgentDeactivate - is the message call to deactivate an agent
