@@ -7,7 +7,7 @@ BRANCH=${shell git rev-parse --abbrev-ref HEAD}
 TAG=latest
 BUILDDATE=${shell date -u +%Y-%m-%dT%H:%M:%SZ}
 IMAGEFULLNAME=${REPO}/${IMAGENAME}
-LASTCOMMIT=$(shell git log -1 --pretty=short | tail -n 1 | tr -d " ")
+LASTCOMMIT=$(shell git log -1 --pretty=short | tail -n 1 | tr -d " " | tr -d "UPDATE:")
 
 .PHONY: help build all docs
 

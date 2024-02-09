@@ -306,6 +306,11 @@ func (e *Scheduler) checkEC2Instance() {
 			err = json.NewDecoder(res.Body).Decode(&agent)
 			if err != nil {
 				logrus.WithField("func", "checkEC2Instances").Error("Could not decode json result: ", err.Error())
+				// Den Inhalt des Body als Text ausgeben
+				body, err := io.ReadAll(res.Body)
+				if err == nil {
+					logrus.WithField("func", "checkEC2Instances").Error("Error Body: ", string(body))
+				}
 				// uncheck these instance
 				instance.Check = false
 				e.Redis.SaveEC2InstanceRedis(*instance)
