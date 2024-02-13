@@ -14,6 +14,7 @@ import (
 	mesosaws "github.com/AVENTER-UG/mesos-autoscale/aws"
 	"github.com/AVENTER-UG/mesos-autoscale/redis"
 	cfg "github.com/AVENTER-UG/mesos-autoscale/types"
+	util "github.com/AVENTER-UG/util/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -342,7 +343,7 @@ func (e *Scheduler) checkEC2Instance() {
 }
 
 func (e *Scheduler) deactivateNode(agent cfg.MesosAgentState) {
-	logrus.WithField("func", "deactivateNode").Info("Deactivate Node: ", agent.ID)
+	logrus.WithField("func", "mesos.deactivateNode").Info("Deactivate Node: ", agent.ID)
 
 	var deactivateCall cfg.MesosAgentDeactivate
 	deactivateCall.Type = "DEACTIVATE_AGENT"
@@ -350,7 +351,7 @@ func (e *Scheduler) deactivateNode(agent cfg.MesosAgentState) {
 
 	d, err := json.Marshal(deactivateCall)
 	if err != nil {
-		logrus.WithField("func", "deactivateNode").Error("Could not encode json: ", err.Error())
+		logrus.WithField("func", "mesos.deactivateNode").Error("Could not encode json: ", err.Error())
 	}
 
 	protocol := "https"
@@ -370,9 +371,14 @@ func (e *Scheduler) deactivateNode(agent cfg.MesosAgentState) {
 	req.Header.Set("Content-Type", "application/json")
 	res, err := client.Do(req)
 
+	if res.StatusCode != 200 {
+		logrus.WithField("func", "mesos.deactivateNode").Error("Could not deactivate. Status code: ", res.StatusCode)
+		logrus.WithField("func", "mesos.deactivateNode").Debug("JSON: ", util.PrettyJSON(d))
+	}
+
 	defer res.Body.Close()
 	if err != nil {
-		logrus.WithField("func", "deactivateNode").Error("Could not connect to agent: ", err.Error())
+		logrus.WithField("func", "mesos.deactivateNode").Error("Could not connect to agent: ", err.Error())
 	}
 }
 

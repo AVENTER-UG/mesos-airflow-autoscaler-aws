@@ -7,7 +7,7 @@ import (
 	mesosaws "github.com/AVENTER-UG/mesos-autoscale/aws"
 	"github.com/AVENTER-UG/mesos-autoscale/mesos"
 	"github.com/AVENTER-UG/mesos-autoscale/redis"
-	util "github.com/AVENTER-UG/util"
+	util "github.com/AVENTER-UG/util/util"
 	"github.com/sirupsen/logrus"
 )
 

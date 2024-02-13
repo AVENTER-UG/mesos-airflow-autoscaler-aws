@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	util "github.com/AVENTER-UG/util"
+	util "github.com/AVENTER-UG/util/util"
 	"github.com/sirupsen/logrus"
 
 	cfg "github.com/AVENTER-UG/mesos-autoscale/types"
