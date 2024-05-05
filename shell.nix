@@ -8,5 +8,7 @@ mkShell {
     syft
     grype
     docker
+    docker-credential-helpers    
+    trivy
   ];
 }
