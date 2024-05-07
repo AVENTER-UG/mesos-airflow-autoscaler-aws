@@ -4,8 +4,8 @@
 IMAGENAME=mesos-airflow-autoscaler-aws
 REPO=avhost
 BRANCH=${shell git rev-parse --abbrev-ref HEAD}
-TAG=latest
-BUILDDATE=${shell date -u +%Y%m%d}
+TAG=$(shell git describe)
+BUILDDATE=$(shell date -u +%Y%m%d)
 IMAGEFULLNAME=${REPO}/${IMAGENAME}
 LASTCOMMIT=$(shell git log -1 --pretty=short | tail -n 1 | tr -d " " | tr -d "UPDATE:")
 
@@ -34,7 +34,7 @@ else
 endif
 
 build:
-	@echo ">>>> Build Docker branch: latest" 
+	@echo ">>>> Build Docker branch: " ${BRANCH}_${BUILDDATE}
 	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
 
 build-bin:
@@ -43,9 +43,11 @@ build-bin:
 
 push:
 	@echo ">>>> Publish docker image: " ${BRANCH}_${BUILDDATE}
-	@docker  build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH}_${BUILDDATE} .
-	@docker  build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
-	@docker  build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
+	@docker buildx create --use --name buildkit	
+	@docker buildx build --sbom=true --provenance=true --push --platform linux/amd64 --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH}_${BUILDDATE} .
+	@docker buildx build --sbom=true --provenance=true --push --platform linux/amd64 --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@docker buildx build --sbom=true --provenance=true --push --platform linux/amd64 --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
+	@docker buildx rm buildkit	
 
 update-gomod:
 	go get -u
@@ -71,5 +73,8 @@ version:
 	@cat .version.json
 	@echo "Saved under .version.json"
 
-check: go-fmt sboom seccheck
+imagecheck: build
+	trivy image ${IMAGEFULLNAME}:${BRANCH}_${BUILDDATE}		
+
+check: go-fmt sboom seccheck imagecheck
 all: check build version sboom 
