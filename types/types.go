@@ -34,6 +34,7 @@ type Config struct {
 	AWSInstanceFallback            string
 	AWSInstanceAllow               []InstanceTypes
 	AWSInstanceTerminate           bool
+	AWSInstanceMaxAge              time.Duration
 	AWSLaunchTemplateID            string
 	MesosAgentUsername             string
 	MesosAgentPassword             string

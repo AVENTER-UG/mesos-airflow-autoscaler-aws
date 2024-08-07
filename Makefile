@@ -3,7 +3,7 @@
 #vars
 IMAGENAME=mesos-airflow-autoscaler-aws
 REPO=avhost
-BRANCH=${shell git rev-parse --abbrev-ref HEAD}
+BRANCH=$(shell git symbolic-ref --short HEAD | xargs basename)
 TAG=$(shell git describe)
 BUILDDATE=$(shell date -u +%Y%m%d)
 IMAGEFULLNAME=${REPO}/${IMAGENAME}
@@ -24,18 +24,16 @@ help:
 .DEFAULT_GOAL := all
 
 ifeq (${BRANCH}, master) 
-	BRANCH=latest
+        BRANCH=latest
 endif
 
 ifneq ($(shell echo $(LASTCOMMIT) | grep -E '^v([0-9]+\.){0,2}(\*|[0-9]+)'),)
 	BRANCH=${LASTCOMMIT}
-else
-	BRANCH=latest
 endif
 
 build:
 	@echo ">>>> Build Docker branch: " ${BRANCH}_${BUILDDATE}
-	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH}_${BUILDDATE} .
 
 build-bin:
 	@echo ">>>> Build binary"

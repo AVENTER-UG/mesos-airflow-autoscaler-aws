@@ -56,6 +56,9 @@ func init() {
 	// set mesos agent timeout
 	config.MesosAgentTimeout, _ = time.ParseDuration(util.Getenv("MESOS_AGENT_TIMEOUT", "10m"))
 
+	// set max age of an instance
+	config.AWSInstanceMaxAge, _ = time.ParseDuration(util.Getenv("AWS_INSTANCE_MAX_AGE", "6h"))
+
 	// set TTL for dags in redis
 	config.RedisTTL, _ = time.ParseDuration(util.Getenv("DAG_TTL", "6h"))
 

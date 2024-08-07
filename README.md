@@ -40,6 +40,7 @@ To open an issue, please use this place: https://github.com/m3scluster/mesos-air
 | AWS_INSTANCE_FALLBACK | t3a.2xlarge | Fallback instance type will be used if there are no more ec2 resources in AWS. |
 | AWS_INSTANCE_DEFAULT_ARCHITECTURE | x86_64 | Default architecture of ec2 instance. | 
 | AWS_INSTANCE_ALLOW | "t3.,r5.,c5." | Only these instances are allowed. |
+| AWS_INSTANCE_MAX_AGE | 6h | Max age on an instance. That should prevent instances to run endless. |
 | MESOS_AGENT_SSL | false | Enable SSL for the communication to the Mesos agent |
 | MESOS_AGENT_USERNAME | | Username of the Mesos Agent |
 | MESOS_AGENT_PASSWORD | | Password of the Mesos Agent |

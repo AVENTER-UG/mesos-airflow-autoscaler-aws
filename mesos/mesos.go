@@ -3,7 +3,6 @@ package mesos
 import (
 	"bytes"
 	"crypto/tls"
-	cTls "crypto/tls"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -180,7 +179,7 @@ func (e *Scheduler) getDags() []cfg.DagTask {
 	client := &http.Client{}
 	client.Transport = &http.Transport{
 		// #nosec G402
-		TLSClientConfig: &cTls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	req, _ := http.NewRequest("GET", e.Config.AirflowMesosScheduler+"/v0/dags", nil)
 	req.Close = true
@@ -221,7 +220,7 @@ func (e *Scheduler) convertMemoryToFloat(memoryStr string) float64 {
 		}
 		memoryVal *= 1024
 	} else if strings.HasSuffix(memoryStr, "m") {
-		memoryVal, _ = strconv.ParseFloat(memoryStr[:len(memoryStr)-1], 64)
+		memoryVal, err = strconv.ParseFloat(memoryStr[:len(memoryStr)-1], 64)
 		if err != nil {
 			return 1000.0
 		}
@@ -330,8 +329,8 @@ func (e *Scheduler) checkEC2Instance() {
 			instance.Check = false
 			e.Redis.SaveEC2InstanceRedis(*instance)
 
-			// check if there is still a airflow task running
-			if !e.isFrameworkName(agent) && e.Config.AWSInstanceTerminate {
+			// check if there is still a airflow task running or if the instance reach the max age
+			if (!e.isFrameworkName(agent) || timeDiff >= e.Config.AWSInstanceMaxAge.Minutes()) && e.Config.AWSInstanceTerminate {
 				e.terminateNode(agent, instance)
 				e.deactivateNode(agent)
 			}
@@ -401,11 +400,11 @@ func (e *Scheduler) terminateNode(agent cfg.MesosAgentState, instance *cfg.EC2St
 	req.Header.Set("Content-Type", "application/json")
 	res, err := client.Do(req)
 
-	defer res.Body.Close()
-
 	if err != nil {
 		logrus.WithField("func", "terminateNode").Error("Could not connect to agent: ", err.Error())
 	}
+
+	defer res.Body.Close()
 
 	if res.StatusCode == http.StatusOK {
 		var state cfg.MesosAgent
