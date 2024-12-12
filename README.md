@@ -7,6 +7,10 @@
 
 This AWS autoscaler will start EC2 instances if Airflow does not get matched offers from mesos.
 
+## Funding
+
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=H553XE4QJ9GJ8)
+
 ## Issues
 
 To open an issue, please use this place: https://github.com/m3scluster/mesos-airflow-autoscaler-aws/issues

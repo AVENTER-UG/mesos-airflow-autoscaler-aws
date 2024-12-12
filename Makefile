@@ -3,9 +3,11 @@
 #vars
 IMAGENAME=mesos-airflow-autoscaler-aws
 REPO=avhost
+BRANCH=${shell git rev-parse --abbrev-ref HEAD}
+TAG=latest
+BUILDDATE=${shell date -u +%Y%m%d}
 BRANCH=$(shell git symbolic-ref --short HEAD | xargs basename)
-TAG=$(shell git describe)
-BUILDDATE=$(shell date -u +%Y%m%d)
+BRANCHSHORT=$(shell echo ${BRANCH} | awk -F. '{ print $$1"."$$2 }')
 IMAGEFULLNAME=${REPO}/${IMAGENAME}
 LASTCOMMIT=$(shell git log -1 --pretty=short | tail -n 1 | tr -d " " | tr -d "UPDATE:")
 
@@ -41,11 +43,11 @@ build-bin:
 
 push:
 	@echo ">>>> Publish docker image: " ${BRANCH}_${BUILDDATE}
-	@docker buildx create --use --name buildkit	
-	@docker buildx build --sbom=true --provenance=true --push --platform linux/amd64 --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH}_${BUILDDATE} .
-	@docker buildx build --sbom=true --provenance=true --push --platform linux/amd64 --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
-	@docker buildx build --sbom=true --provenance=true --push --platform linux/amd64 --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
-	@docker buildx rm buildkit	
+	@docker buildx create --use --name buildkit
+	@docker buildx build --sbom=true --provenance=true --platform linux/amd64 --push --build-arg TAG=${BRANCH} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@docker buildx build --sbom=true --provenance=true --platform linux/amd64 --push --build-arg TAG=${BRANCH} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCHSHORT} .
+	@docker buildx build --sbom=true --provenance=true --platform linux/amd64 --push --build-arg TAG=${BRANCH} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
+	@docker buildx rm buildkit
 
 update-gomod:
 	go get -u
