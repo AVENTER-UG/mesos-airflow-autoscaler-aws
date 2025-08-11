@@ -18,6 +18,7 @@ var config cfg.Config
 func init() {
 
 	config.AppName = "AWS Autoscale for Apache Airflow"
+	config.AWSAssumeRoleARN = util.Getenv("AWS_ASSUME_ROLE_ARN", "")
 	config.AWSWait = util.Getenv("AWS_WAIT_TIME", "10m")
 	config.AWSLaunchTemplateID = os.Getenv("AWS_LAUNCH_TEMPLATE_ID")
 	config.AWSRegion = util.Getenv("AWS_REGION", "eu-central-1")

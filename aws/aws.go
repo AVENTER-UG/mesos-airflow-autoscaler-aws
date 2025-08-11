@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 )
 
 // AWS struct about the AWS functions
@@ -24,15 +25,35 @@ func New(config *cfg.Config) *AWS {
 			Region: aws.String(config.AWSRegion),
 		},
 	}
-	var err error
-	e.Session, err = session.NewSession(e.AWSConfig)
+
+	// Basis-Session
+	baseSess, err := session.NewSession()
 
 	if err != nil {
-		logrus.WithField("func", "MesosAWSNew").Error("Could not create session: ", err.Error())
+		logrus.WithField("func", "MesosAWSNew").Error("Could not create base session: ", err.Error())
+		return nil
+	}
+
+	// Temp Credentials with autoupdate
+	roleCreds := stscreds.NewCredentials(baseSess, config.AWSAssumeRoleARN)
+
+	e.AWSConfig.Credentials = roleCreds
+
+	e.Session, err = session.NewSession()
+	if err != nil {
+		logrus.WithField("func", "MesosAWSNew").Error("Could not create session with assumed role: ", err.Error())
+		return nil
+	}
+
+	// Try-Catch-Block
+	errRe := recover()
+	if errRe != nil {
+		logrus.WithField("func", "MesosAWSNew").Error("Recovered error: ", errRe)
 	}
 
 	return e
 }
+
 
 func (e *AWS) FindMatchedInstanceType(mem int64, cpu int64, arch string) string {
 	logrus.WithField("func", "aws.FindMarchedInstanceType").Debug()

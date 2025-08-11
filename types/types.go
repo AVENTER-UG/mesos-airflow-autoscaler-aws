@@ -29,6 +29,7 @@ type Config struct {
 	RedisTTL                       time.Duration
 	APIUsername                    string
 	APIPassword                    string
+	AWSAssumeRoleARN               string
 	AWSRegion                      string
 	AWSInstanceDefaultArchitecture string
 	AWSInstanceFallback            string
