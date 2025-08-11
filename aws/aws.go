@@ -5,9 +5,9 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 )
 
 // AWS struct about the AWS functions
@@ -53,7 +53,6 @@ func New(config *cfg.Config) *AWS {
 
 	return e
 }
-
 
 func (e *AWS) FindMatchedInstanceType(mem int64, cpu int64, arch string) string {
 	logrus.WithField("func", "aws.FindMarchedInstanceType").Debug()
