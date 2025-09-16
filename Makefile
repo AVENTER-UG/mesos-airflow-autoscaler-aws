@@ -4,9 +4,9 @@
 IMAGENAME=mesos-airflow-autoscaler-aws
 REPO=avhost
 BRANCH=${shell git rev-parse --abbrev-ref HEAD}
-TAG=latest
+TAG=v0.2.8
 BUILDDATE=${shell date -u +%Y%m%d}
-BRANCH=$(shell git symbolic-ref --short HEAD | xargs basename)
+BRANCH=${TAG}
 BRANCHSHORT=$(shell echo ${BRANCH} | awk -F. '{ print $$1"."$$2 }')
 IMAGEFULLNAME=${REPO}/${IMAGENAME}
 LASTCOMMIT=$(shell git log -1 --pretty=short | tail -n 1 | tr -d " " | tr -d "UPDATE:")
@@ -35,19 +35,19 @@ endif
 
 build:
 	@echo ">>>> Build Docker branch: " ${BRANCH}_${BUILDDATE}
-	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH}_${BUILDDATE} .
+	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
 
 build-bin:
 	@echo ">>>> Build binary"
 	@CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags "-X main.BuildVersion=${BUILDDATE} -X main.GitVersion=${TAG} -extldflags \"-static\"" .
 
 push:
-	@echo ">>>> Publish docker image: " ${BRANCH}_${BUILDDATE}
-	@docker buildx create --use --name buildkit
+	@echo ">>>> Publish docker image: " ${BRANCH} ${BRANCHSHORT}
+	-docker buildx create --use --name buildkit
 	@docker buildx build --sbom=true --provenance=true --platform linux/amd64 --push --build-arg TAG=${BRANCH} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
 	@docker buildx build --sbom=true --provenance=true --platform linux/amd64 --push --build-arg TAG=${BRANCH} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCHSHORT} .
 	@docker buildx build --sbom=true --provenance=true --platform linux/amd64 --push --build-arg TAG=${BRANCH} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
-	@docker buildx rm buildkit
+	-docker buildx rm buildkit
 
 update-gomod:
 	go get -u
@@ -74,7 +74,7 @@ version:
 	@echo "Saved under .version.json"
 
 imagecheck: build
-	trivy image ${IMAGEFULLNAME}:${BRANCH}_${BUILDDATE}		
+	grype --add-cpes-if-none ${IMAGEFULLNAME}:latest > cve-report.md
 
 check: go-fmt sboom seccheck imagecheck
 all: check build version sboom 
