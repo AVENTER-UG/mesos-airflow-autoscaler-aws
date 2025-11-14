@@ -9,9 +9,14 @@ import (
 )
 
 // CreateInstance - Create a AWS instance
-func (e *AWS) CreateInstance(instanceType string) *ec2.Reservation {
+func (e *AWS) CreateInstance(instanceType string, gpu bool) *ec2.Reservation {
 	// Create EC2 service client
 	e.SVC = ec2.New(e.Session)
+
+	launchID := e.Config.AWSLaunchTemplateID
+	if gpu && len(e.Config.AWSLaunchTemplateGPUID) > 0 {
+		launchID = e.Config.AWSLaunchTemplateGPUID
+	}
 
 	// Specify the details of the instance that you want to create.
 	runResult, err := e.SVC.RunInstances(&ec2.RunInstancesInput{
@@ -20,7 +25,7 @@ func (e *AWS) CreateInstance(instanceType string) *ec2.Reservation {
 		MinCount:     aws.Int64(1),
 		MaxCount:     aws.Int64(1),
 		LaunchTemplate: &ec2.LaunchTemplateSpecification{
-			LaunchTemplateId: aws.String(e.Config.AWSLaunchTemplateID),
+			LaunchTemplateId: aws.String(launchID),
 		},
 		TagSpecifications: []*ec2.TagSpecification{
 			{
@@ -47,7 +52,7 @@ func (e *AWS) CreateInstance(instanceType string) *ec2.Reservation {
 		// create fallback instance if the AWS capacity is not enough
 		if strings.Contains(err.Error(), "InsufficientInstanceCapacity") {
 			logrus.WithField("func", "mesosaws.CreateInstance").Info("Insufficient instance capacity. Try to create fallback instance.")
-			return e.CreateInstance(e.Config.AWSInstanceFallback)
+			return e.CreateInstance(e.Config.AWSInstanceFallbackGPU, gpu)
 		}
 		logrus.WithField("func", "mesosaws.CreateInstance").Error("Could not create instance: ", err.Error())
 		return &ec2.Reservation{}

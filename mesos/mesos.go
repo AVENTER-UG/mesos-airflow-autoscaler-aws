@@ -128,11 +128,12 @@ func (e *Scheduler) scaleOut(task *cfg.DagTask, instanceType string) {
 
 		logrus.WithField("func", "mesos.scaleOut").Tracef("Need Mem: %d ", mem)
 		logrus.WithField("func", "mesos.scaleOut").Tracef("Need CPU: %d ", cpu)
+		logrus.WithField("func", "mesos.scaleOut").Tracef("Need GPU: %b ", task.GPU)
 		logrus.WithField("func", "mesos.scaleOut").Tracef("Need Architecture: %s ", task.MesosExecutor.Architecture)
 
-		instanceType = e.AWS.FindMatchedInstanceType(mem, cpu, task.MesosExecutor.Architecture)
+		instanceType = e.AWS.FindMatchedInstanceType(mem, cpu, task.MesosExecutor.Architecture, task.GPU)
 	}
-	ec.EC2 = e.AWS.CreateInstance(instanceType)
+	ec.EC2 = e.AWS.CreateInstance(instanceType, task.GPU)
 	e.Redis.SaveEC2InstanceRedis(ec)
 }
 
@@ -141,13 +142,19 @@ func (e *Scheduler) saveDags() {
 	dags := e.getDags()
 
 	for _, i := range dags {
+		gpu := false
 		sTask := e.Redis.GetTaskFromRunID(e.Config.RedisPrefix + ":dags:" + i.DagID + ":" + i.TaskID + ":" + i.RunID + ":" + strconv.Itoa(i.TryNumber))
 		if sTask == nil {
 			mem := e.convertMemoryToFloat(i.MesosExecutor.MemLimit)
 			if i.MesosExecutor.InstanceType == "" {
-				i.MesosExecutor.InstanceType = e.AWS.FindMatchedInstanceType(int64(mem*1.1), int64(i.MesosExecutor.Cpus), i.MesosExecutor.Architecture)
+				if e.hasGPU(i.MesosExecutor.Attributes) {
+					gpu = true
+				}
+
+				i.MesosExecutor.InstanceType = e.AWS.FindMatchedInstanceType(int64(mem*1.1), int64(i.MesosExecutor.Cpus), i.MesosExecutor.Architecture, gpu)
 			}
 			i.StartDate = time.Now()
+			i.GPU = gpu
 			e.Redis.SaveDagTaskRedis(i)
 			logrus.WithField("func", "EventLoop").Info("Found new DAG in queue: ", i.DagID)
 			logrus.WithField("func", "EventLoop").Trace("Dag ID: ", i.DagID)
@@ -157,8 +164,10 @@ func (e *Scheduler) saveDags() {
 			logrus.WithField("func", "EventLoop").Trace("Dag StartDate: ", i.StartDate)
 			logrus.WithField("func", "EventLoop").Trace("Dag CPUs: ", i.MesosExecutor.Cpus)
 			logrus.WithField("func", "EventLoop").Trace("Dag MEM: ", mem)
+			logrus.WithField("func", "EventLoop").Tracef("Dag GPU: %b", gpu)
 			logrus.WithField("func", "EventLoop").Trace("Dag Architecture: ", i.MesosExecutor.Architecture)
 			logrus.WithField("func", "EventLoop").Trace("Dag InstanceType: ", i.MesosExecutor.InstanceType)
+			logrus.WithField("func", "EventLoop").Tracef("Dag Attributes: %v", i.MesosExecutor.Attributes)
 			logrus.WithField("func", "EventLoop").Trace("ASG: ", i.ASG)
 			logrus.WithField("func", "EventLoop").Trace("---------------------------------------")
 		} else if sTask.ASG {
@@ -168,6 +177,7 @@ func (e *Scheduler) saveDags() {
 			if timeDiff >= e.Config.WaitTimeoutOverwrite.Seconds() {
 				logrus.WithField("func", "EventLoop").Debugf("DAG (%s) still not running. Try other instance type: ", i.DagID)
 				sTask.StartDate = time.Now()
+				sTask.GPU = gpu
 				e.scaleOut(sTask, "")
 			}
 		}
@@ -206,6 +216,16 @@ func (e *Scheduler) getDags() []cfg.DagTask {
 	}
 
 	return dags
+}
+
+// HasGPU check if attribute has gpu:true
+func (e *Scheduler) hasGPU(attributes []string) bool {
+	for _, attr := range attributes {
+		if attr == "gpu:true" {
+			return true
+		}
+	}
+	return false
 }
 
 func (e *Scheduler) convertMemoryToFloat(memoryStr string) float64 {
@@ -292,7 +312,7 @@ func (e *Scheduler) checkEC2Instance() {
 				e.Redis.DelRedisKey(e.Config.RedisPrefix + ":ec2:" + *instance.EC2.Instances[0].InstanceId)
 				// create a new instance
 				var ec cfg.EC2Struct
-				ec.EC2 = e.AWS.CreateInstance(*instance.EC2.Instances[0].InstanceType)
+				ec.EC2 = e.AWS.CreateInstance(*instance.EC2.Instances[0].InstanceType, instance.GPU)
 				e.Redis.SaveEC2InstanceRedis(ec)
 				continue
 			}

@@ -33,10 +33,12 @@ type Config struct {
 	AWSRegion                      string
 	AWSInstanceDefaultArchitecture string
 	AWSInstanceFallback            string
+	AWSInstanceFallbackGPU         string
 	AWSInstanceAllow               []InstanceTypes
 	AWSInstanceTerminate           bool
 	AWSInstanceMaxAge              time.Duration
 	AWSLaunchTemplateID            string
+	AWSLaunchTemplateGPUID         string
 	MesosAgentUsername             string
 	MesosAgentPassword             string
 	MesosAgentPort                 string
@@ -53,6 +55,7 @@ type InstanceTypes struct {
 	Name string
 	CPU  float64
 	MEM  float64
+	GPU  bool `default:"false"`
 	Arch string
 }
 
@@ -63,12 +66,14 @@ type DagTask struct {
 	RunID         string `json:"run_id"`
 	TryNumber     int    `json:"try_number"`
 	ASG           bool   `json:"ASG" default:"false"`
+	GPU           bool   `default:"false"`
 	StartDate     time.Time
 	MesosExecutor struct {
-		Cpus         float64 `json:"cpus"`
-		MemLimit     string  `json:"mem_limit" default:"10g"`
-		InstanceType string  `json:"instance_type"`
-		Architecture string  `json:"architecture" default:"x86_64"`
+		Cpus         float64  `json:"cpus"`
+		MemLimit     string   `json:"mem_limit" default:"10g"`
+		InstanceType string   `json:"instance_type"`
+		Architecture string   `json:"architecture" default:"x86_64"`
+		Attributes   []string `json:"attributes"`
 	} `json:"MesosExecutor"`
 }
 
@@ -494,7 +499,8 @@ type MesosAgentState struct {
 type EC2Struct struct {
 	EC2          *ec2.Reservation
 	AgentTimeout int  `default:"0"`
-	Check        bool `efault:"false"`
+	Check        bool `default:"false"`
+	GPU          bool `default:"false"`
 }
 
 // MesosAgentDeactivate - is the message call to deactivate an agent
