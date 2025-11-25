@@ -4,7 +4,7 @@
 IMAGENAME=mesos-airflow-autoscaler-aws
 REPO=avhost
 BRANCH=${shell git rev-parse --abbrev-ref HEAD}
-TAG=v0.2.8
+TAG=v0.3.0
 BUILDDATE=${shell date -u +%Y%m%d}
 BRANCH=${TAG}
 BRANCHSHORT=$(shell echo ${BRANCH} | awk -F. '{ print $$1"."$$2 }')
