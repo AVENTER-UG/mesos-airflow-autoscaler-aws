@@ -289,7 +289,11 @@ func (e *Scheduler) checkEC2Instance() {
 			}
 			client.Transport = &http.Transport{
 				// #nosec G402
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+				TLSClientConfig: &tls.Config{
+					MinVersion:         tls.VersionTLS10,
+					MaxVersion:         tls.VersionTLS13,
+					InsecureSkipVerify: true,
+				},
 			}
 
 			protocol := "https"
@@ -382,7 +386,11 @@ func (e *Scheduler) deactivateNode(agent cfg.MesosAgentState) {
 	}
 	client.Transport = &http.Transport{
 		// #nosec G402
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS10,
+			MaxVersion:         tls.VersionTLS13,
+			InsecureSkipVerify: true,
+		},
 	}
 	req, _ := http.NewRequest("POST", protocol+"://"+e.Config.MesosMaster+":"+e.Config.MesosMasterPort+"/api/v1", bytes.NewBuffer([]byte(d)))
 	req.Close = true
@@ -412,7 +420,11 @@ func (e *Scheduler) terminateNode(agent cfg.MesosAgentState, instance *cfg.EC2St
 	}
 	client.Transport = &http.Transport{
 		// #nosec G402
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS10,
+			MaxVersion:         tls.VersionTLS13,
+			InsecureSkipVerify: true,
+		},
 	}
 	req, _ := http.NewRequest("POST", protocol+"://"+e.Config.MesosMaster+":"+e.Config.MesosMasterPort+"/slaves/"+agent.ID, nil)
 	req.Close = true
